@@ -4,6 +4,32 @@
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
 
+## SDET — Secure Data Erasure Tool
+
+A Python desktop application in `sdet/` implementing NIST SP 800-88 Rev. 2 CLEAR sanitization.
+
+### Files
+- `sdet/erasure_engine.py` — Core erasure logic (NIST Clear, Gutmann, DoD, audit log, blacklist)
+- `sdet/sdet_cli.py` — CLI interface with progress bar, color output, all flags
+- `sdet/sdet_gui.py` — CustomTkinter dark-mode GUI with Normal/Advanced modes
+- `sdet/requirements.txt` — Python dependencies (`customtkinter`)
+- `sdet/README.md` — Full documentation
+
+### Running
+```bash
+# CLI
+python3 sdet/sdet_cli.py --file secret.txt
+python3 sdet/sdet_cli.py --purge-info
+python3 sdet/sdet_cli.py --file secret.txt --legacy gutmann --no-confirm
+
+# GUI
+python3 sdet/sdet_gui.py
+```
+
+### Python Dependencies
+- Python 3.11 (installed via Replit module)
+- `customtkinter==5.2.2` (installed via uv/pip)
+
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
