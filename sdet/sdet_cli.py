@@ -121,7 +121,7 @@ def _cli_progress(pct: float, msg: str) -> None:
         print()
 
 
-def main() -> int:
+def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="sdet",
         description="SDET — Secure Data Erasure Tool (NIST SP 800-88 Rev. 2)",
@@ -152,103 +152,146 @@ def main() -> int:
     parser.add_argument("--no-confirm", action="store_true", help="Skip confirmation prompt")
     parser.add_argument("--version", action="version", version="SDET 1.0.0")
 
-    args = parser.parse_args()
+    return parser
 
-    print(BANNER)
 
-    if args.purge_info:
-        print(NIST_PURGE_INFO)
-        return 0
+def _resolve_method(args) -> tuple[str, str, int]:
+    if args.legacy == "gutmann":
+        return (
+            "gutmann",
+            "⚠ LEGACY — Gutmann 35-pass (EDUCATIONAL ONLY)\n"
+            "  NOT recommended for SSDs. Ineffective due to wear leveling.",
+            3,
+        )
+    if args.legacy == "dod3":
+        return (
+            "dod",
+            "⚠ DEPRECATED — DoD 3-pass (NOT RECOMMENDED)\n"
+            "  Obsolete per NIST SP 800-88 Rev. 2.",
+            3,
+        )
+    if args.legacy == "dod7":
+        return (
+            "dod",
+            "⚠ DEPRECATED — DoD 7-pass (NOT RECOMMENDED)\n"
+            "  Obsolete per NIST SP 800-88 Rev. 2.",
+            7,
+        )
 
-    if args.cleanup_logs:
-        _print_colored("  Securely deleting audit log...", "cyan")
-        ok = delete_audit_log()
-        if ok:
-            _print_colored("  ✔ Audit log securely deleted.", "green")
-        else:
-            _print_colored("  ✖ Failed to delete audit log (may not exist).", "yellow")
-        return 0 if ok else 1
+    return (
+        "nist_clear",
+        "✅ NIST SP 800-88 Rev. 2 CLEAR (Recommended)\n"
+        "  1-pass random overwrite + fsync + truncate + unlink",
+        3,
+    )
 
+
+def _run_directory(target_path: str, args) -> int:
+    results = erase_directory(
+        target_path,
+        method=args.method_key,
+        passes=args.dod_passes,
+        randomize_name=args.randomize_name,
+        progress_callback=_cli_progress,
+    )
+    print()
+    success = sum(1 for r in results if r.get("status") == "SUCCESS")
+    failed = len(results) - success
+    _print_colored(
+        f"  Results: {success} succeeded, {failed} failed",
+        "green" if failed == 0 else "yellow",
+    )
+    for r in results:
+        _print_result(r)
+    return 0
+
+
+def _run_file(target_path: str, args) -> int:
+    if args.method_key == "gutmann":
+        _print_colored("  Starting Gutmann 35-pass (this may take a while)...", "yellow")
+        result = gutmann_35pass(target_path, args.randomize_name, _cli_progress)
+    elif args.method_key == "dod":
+        _print_colored(f"  Starting DoD {args.dod_passes}-pass...", "yellow")
+        result = dod_overwrite(target_path, args.dod_passes, args.randomize_name, _cli_progress)
+    else:
+        result = nist_clear(target_path, args.randomize_name, _cli_progress)
+
+    print()
+    _print_result(result)
+    return 0
+
+
+def _print_target_summary(target_path: str, method_label: str, randomize_name: bool) -> None:
+    _print_colored("  Target:  " + target_path, "white")
+    _print_colored("  Method:  " + method_label, "cyan")
+    if randomize_name:
+        _print_colored("  Option:  Randomize filename enabled", "white")
+    _print_colored("\n  ⚠ WARNING: This operation is IRREVERSIBLE.\n", "yellow")
+
+
+def _handle_purge_info(args):
+    if not args.purge_info:
+        return None
+
+    print(NIST_PURGE_INFO)
+    return 0
+
+
+def _handle_cleanup_logs(args):
+    if not args.cleanup_logs:
+        return None
+
+    _print_colored("  Securely deleting audit log...", "cyan")
+    ok = delete_audit_log()
+    _print_colored(
+        "  ✔ Audit log securely deleted." if ok else "  ✖ Failed to delete audit log (may not exist).",
+        "green" if ok else "yellow",
+    )
+    return 0 if ok else 1
+
+
+def _resolve_target(args, parser):
     if not args.file and not args.dir:
         _print_colored("  ✖ ERROR: Specify --file or --dir.\n", "red")
         parser.print_help()
-        return 1
+        raise ValueError("missing target")
 
     target_path = args.file or args.dir
     is_dir = bool(args.dir) or os.path.isdir(target_path)
 
     if is_dir and not args.recursive:
-        _print_colored("  ✖ ERROR: Target is a directory. Use --recursive to erase all files inside.", "red")
+        _print_colored(
+            "  ✖ ERROR: Target is a directory. Use --recursive to erase all files inside.",
+            "red",
+        )
+        raise ValueError("directory requires recursive")
+
+    return target_path, is_dir
+
+
+def main() -> int:
+    parser = _build_arg_parser()
+    args = parser.parse_args()
+
+    print(BANNER)
+
+    for handler in (_handle_purge_info, _handle_cleanup_logs):
+        result = handler(args)
+        if result is not None:
+            return result
+
+    try:
+        target_path, is_dir = _resolve_target(args, parser)
+    except ValueError:
         return 1
 
-    if args.legacy == "gutmann":
-        method_label = "⚠ LEGACY — Gutmann 35-pass (EDUCATIONAL ONLY)"
-        method_label += "\n  NOT recommended for SSDs. Ineffective due to wear leveling."
-        method_key = "gutmann"
-        dod_passes = 3
-    elif args.legacy == "dod3":
-        method_label = "⚠ DEPRECATED — DoD 3-pass (NOT RECOMMENDED)"
-        method_label += "\n  Obsolete per NIST SP 800-88 Rev. 2."
-        method_key = "dod"
-        dod_passes = 3
-    elif args.legacy == "dod7":
-        method_label = "⚠ DEPRECATED — DoD 7-pass (NOT RECOMMENDED)"
-        method_label += "\n  Obsolete per NIST SP 800-88 Rev. 2."
-        method_key = "dod"
-        dod_passes = 7
-    else:
-        method_label = "✅ NIST SP 800-88 Rev. 2 CLEAR (Recommended)"
-        method_label += "\n  1-pass random overwrite + fsync + truncate + unlink"
-        method_key = "nist_clear"
-        dod_passes = 3
+    args.method_key, method_label, args.dod_passes = _resolve_method(args)
 
-    _print_colored("  Target:  " + target_path, "white")
-    _print_colored("  Method:  " + method_label, "cyan")
-    if args.randomize_name:
-        _print_colored("  Option:  Randomize filename enabled", "white")
+    _print_target_summary(target_path, method_label, args.randomize_name)
 
-    _print_colored("\n  ⚠ WARNING: This operation is IRREVERSIBLE.\n", "yellow")
-
-    if not args.no_confirm:
-        if not _confirm("  Are you sure you want to securely erase this target?"):
-            _print_colored("  Aborted by user.", "yellow")
-            return 0
+    if not args.no_confirm and not _confirm("  Are you sure you want to securely erase this target?"):
+        _print_colored("  Aborted by user.", "yellow")
+        return 0
 
     print()
-
-    if is_dir:
-        results = erase_directory(
-            target_path,
-            method=method_key,
-            passes=dod_passes,
-            randomize_name=args.randomize_name,
-            progress_callback=_cli_progress,
-        )
-        print()
-        success = sum(1 for r in results if r.get("status") == "SUCCESS")
-        failed = len(results) - success
-        _print_colored(f"  Results: {success} succeeded, {failed} failed", "green" if failed == 0 else "yellow")
-        for r in results:
-            _print_result(r)
-    else:
-        if method_key == "gutmann":
-            _print_colored("  Starting Gutmann 35-pass (this may take a while)...", "yellow")
-            result = gutmann_35pass(target_path, args.randomize_name, _cli_progress)
-        elif method_key == "dod":
-            _print_colored(f"  Starting DoD {dod_passes}-pass...", "yellow")
-            result = dod_overwrite(target_path, dod_passes, args.randomize_name, _cli_progress)
-        else:
-            result = nist_clear(target_path, args.randomize_name, _cli_progress)
-
-        print()
-        _print_result(result)
-
-    print()
-    _print_colored(f"  Audit log: ~/{AUDIT_LOG_FILE} (SHA-256 anonymized, no raw paths stored)", "cyan")
-    print()
-
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+    return _run_directory(target_path, args) if is_dir else _run_file(target_path, args)

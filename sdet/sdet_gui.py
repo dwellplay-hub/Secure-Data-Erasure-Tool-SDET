@@ -478,7 +478,12 @@ class SDETApp(ctk.CTk):
             self._progress_bar.configure(progress_color=COLOR_SAFE)
 
     def _on_recursive_change(self):
-        pass
+        # The recursive switch is user-facing, so log the change
+        # rather than leaving the callback empty.
+        if self._recursive.get():
+            self._log("Recursive deletion enabled.", COLOR_INFO)
+        else:
+            self._log("Recursive deletion disabled.", COLOR_DIM)
 
     def _browse_file(self):
         path = filedialog.askopenfilename(title="Select file to erase")
@@ -616,48 +621,77 @@ class SDETApp(ctk.CTk):
 
         try:
             if is_dir:
-                results = erase_directory(
-                    path,
-                    method="gutmann" if method == "gutmann" else ("dod" if method in ("dod3", "dod7") else "nist_clear"),
-                    passes=7 if method == "dod7" else 3,
-                    randomize_name=self._randomize.get(),
-                    progress_callback=progress,
-                    stop_event=self._stop_event,
-                )
-                success = sum(1 for r in results if r.get("status") == "SUCCESS")
-                failed = len(results) - success
-                msg = f"✔ Erased {success} files. {failed} failed."
-                color = COLOR_SAFE if failed == 0 else COLOR_WARNING
-                self.after(0, lambda m=msg, c=color: self._log(m, c))
+                self._run_directory_erase(path, method, progress)
             else:
-                if method == "gutmann":
-                    result = gutmann_35pass(path, self._randomize.get(), progress, self._stop_event)
-                elif method == "dod3":
-                    result = dod_overwrite(path, 3, self._randomize.get(), progress, self._stop_event)
-                elif method == "dod7":
-                    result = dod_overwrite(path, 7, self._randomize.get(), progress, self._stop_event)
-                else:
-                    result = nist_clear(path, self._randomize.get(), progress, self._stop_event)
-
-                status = result.get("status")
-                masked = result.get("masked_name", "???")
-
-                if status == "SUCCESS":
-                    self.after(0, lambda m=masked: self._log(f"✔ {m} — Securely erased.", COLOR_SAFE))
-                elif status == "BLOCKED_BLACKLIST":
-                    self.after(0, lambda m=masked: self._log(
-                        f"✖ {m} — BLOCKED: Accidental deletion prevented (critical system path).", COLOR_DANGER
-                    ))
-                elif status == "ABORTED":
-                    self.after(0, lambda m=masked: self._log(f"⚠ {m} — Aborted by user.", COLOR_WARNING))
-                else:
-                    self.after(0, lambda m=masked, s=status: self._log(f"✖ {m} — {s}", COLOR_DANGER))
-
+                result = self._run_file_erase(path, method, progress)
+                self._log_file_result(result)
         except Exception as ex:
             err = str(ex)
             self.after(0, lambda e=err: self._log(f"✖ Error: {e}", COLOR_DANGER))
         finally:
             self.after(0, self._on_erase_complete)
+
+    def _resolve_erase_params(self, method: str):
+        if method == "gutmann":
+            return "gutmann", 3
+        if method == "dod7":
+            return "dod", 7
+        if method == "dod3":
+            return "dod", 3
+        return "nist_clear", 3
+
+    def _log_file_result(self, result):
+        status = result.get("status")
+        masked = result.get("masked_name", "???")
+
+        status_map = {
+            "SUCCESS": (
+                f"✔ {masked} — Securely erased.",
+                COLOR_SAFE,
+            ),
+            "BLOCKED_BLACKLIST": (
+                f"✖ {masked} — BLOCKED: Accidental deletion prevented (critical system path).",
+                COLOR_DANGER,
+            ),
+            "ABORTED": (
+                f"⚠ {masked} — Aborted by user.",
+                COLOR_WARNING,
+            ),
+        }
+
+        msg, color = status_map.get(
+            status,
+            (f"✖ {masked} — {status}", COLOR_DANGER),
+        )
+        self.after(0, lambda m=msg, c=color: self._log(m, c))
+
+    def _run_directory_erase(self, path: str, method: str, progress):
+        engine_method, passes = self._resolve_erase_params(method)
+        results = erase_directory(
+            path,
+            method=engine_method,
+            passes=passes,
+            randomize_name=self._randomize.get(),
+            progress_callback=progress,
+            stop_event=self._stop_event,
+        )
+
+        success = sum(1 for r in results if r.get("status") == "SUCCESS")
+        failed = len(results) - success
+        msg = f"✔ Erased {success} files. {failed} failed."
+        color = COLOR_SAFE if failed == 0 else COLOR_WARNING
+        self.after(0, lambda m=msg, c=color: self._log(m, c))
+
+    def _run_file_erase(self, path: str, method: str, progress):
+        engine_method, passes = self._resolve_erase_params(method)
+
+        if engine_method == "gutmann":
+            return gutmann_35pass(path, self._randomize.get(), progress, self._stop_event)
+
+        if engine_method == "nist_clear":
+            return nist_clear(path, self._randomize.get(), progress, self._stop_event)
+
+        return dod_overwrite(path, passes, self._randomize.get(), progress, self._stop_event)
 
     def _update_progress(self, pct: float, msg: str):
         self._progress_bar.set(pct)
