@@ -35,11 +35,26 @@ jobs:
         python -m pip install --upgrade pip
         pip install customtkinter pyinstaller
 
+    # ---------------------------------------------------------
+    # PEMBINAAN CLI (COMMAND-LINE INTERFACE)
+    # KRITIKAL: Flag --console memastikan ia tidak bisu di Windows
+    # Flag --clean membuang sisa cache (bulletproof build)
+    # ---------------------------------------------------------
     - name: Build CLI (PyInstaller)
-      run: pyinstaller --onefile --name SDET-CLI-${{ runner.os }} sdet/sdet_cli.py
+      run: >
+        pyinstaller --clean --onefile --console 
+        --name SDET-CLI-${{ runner.os }} 
+        sdet/sdet_cli.py
 
+    # ---------------------------------------------------------
+    # PEMBINAAN GUI (GRAPHICAL USER INTERFACE)
+    # KRITIKAL: Flag --windowed menyembunyikan terminal hitam
+    # ---------------------------------------------------------
     - name: Build GUI (PyInstaller)
-      run: pyinstaller --onefile --windowed --collect-all customtkinter --name SDET-GUI-${{ runner.os }} sdet/sdet_gui.py
+      run: >
+        pyinstaller --clean --onefile --windowed --collect-all customtkinter 
+        --name SDET-GUI-${{ runner.os }} 
+        sdet/sdet_gui.py
 
     # KHAS UNTUK MAC: Mac menghasilkan folder .app untuk GUI, kita perlu zipkannya
     - name: Zip macOS App Bundle (macOS Only)

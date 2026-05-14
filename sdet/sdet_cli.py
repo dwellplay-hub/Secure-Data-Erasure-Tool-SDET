@@ -5,17 +5,6 @@ NIST SP 800-88 Rev. 2 Aligned
 
 Usage:
     python sdet_cli.py --file <path> [options]
-
-Options:
-    --nist-clear          NIST SP 800-88 CLEAR (default, recommended)
-    --legacy gutmann      Gutmann 35-pass (LEGACY - educational only)
-    --legacy dod3         DoD 3-pass (DEPRECATED - educational only)
-    --legacy dod7         DoD 7-pass (DEPRECATED - educational only)
-    --purge-info          Display NIST PURGE information only (no erasure)
-    --recursive           Recursively erase all files in a directory
-    --randomize-name      Randomize filename before deletion (metadata obfuscation)
-    --cleanup-logs        Securely delete the audit log file
-    --no-confirm          Skip confirmation prompt (use with care)
 """
 
 import sys
@@ -23,6 +12,7 @@ import os
 import argparse
 import textwrap
 
+# Memastikan modul sdet boleh diimport dari mana-mana lokasi terminal dijalankan
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sdet.erasure_engine import (
@@ -34,17 +24,16 @@ from sdet.erasure_engine import (
     AUDIT_LOG_FILE,
 )
 
-
 BANNER = r"""
 ╔══════════════════════════════════════════════════════════════╗
-║          SDET — Secure Data Erasure Tool v1.0               ║
-║     NIST SP 800-88 Rev. 2 Aligned File-Level Sanitization   ║
+║           SDET — Secure Data Erasure Tool v1.0               ║
+║      NIST SP 800-88 Rev. 2 Aligned File-Level Sanitization   ║
 ╚══════════════════════════════════════════════════════════════╝
 """
 
 NIST_PURGE_INFO = """
 ╔══════════════════════════════════════════════════════════════╗
-║                 ℹ  NIST PURGE — Information Only             ║
+║                 ℹ  NIST PURGE — Information Only              ║
 ╚══════════════════════════════════════════════════════════════╝
 
 NIST SP 800-88 Rev. 2 defines PURGE as cryptographic erase or
@@ -68,7 +57,6 @@ RECOMMENDED TOOLS FOR NIST PURGE:
 ⚠ SDET does NOT perform NIST PURGE. Use firmware tools for PURGE.
 """
 
-
 def _print_colored(text: str, color: str = "") -> None:
     colors = {
         "red": "\033[91m",
@@ -84,7 +72,6 @@ def _print_colored(text: str, color: str = "") -> None:
         print(f"{colors.get(color, '')}{text}{colors['reset']}")
     else:
         print(text)
-
 
 def _print_result(result: dict) -> None:
     status = result.get("status", "UNKNOWN")
@@ -102,14 +89,12 @@ def _print_result(result: dict) -> None:
     else:
         _print_colored(f"  ✖ {masked} — {status}", "red")
 
-
 def _confirm(prompt: str) -> bool:
     try:
         response = input(f"{prompt} [y/N]: ").strip().lower()
         return response in ("y", "yes")
     except (EOFError, KeyboardInterrupt):
         return False
-
 
 def _cli_progress(pct: float, msg: str) -> None:
     bar_len = 40
@@ -119,7 +104,6 @@ def _cli_progress(pct: float, msg: str) -> None:
     sys.stdout.flush()
     if pct >= 1.0:
         print()
-
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -154,14 +138,13 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
     return parser
 
-
 def _resolve_method(args) -> tuple[str, str, int]:
     if args.legacy == "gutmann":
         return (
             "gutmann",
             "⚠ LEGACY — Gutmann 35-pass (EDUCATIONAL ONLY)\n"
             "  NOT recommended for SSDs. Ineffective due to wear leveling.",
-            3,
+            35,
         )
     if args.legacy == "dod3":
         return (
@@ -182,9 +165,8 @@ def _resolve_method(args) -> tuple[str, str, int]:
         "nist_clear",
         "✅ NIST SP 800-88 Rev. 2 CLEAR (Recommended)\n"
         "  1-pass random overwrite + fsync + truncate + unlink",
-        3,
+        1,
     )
-
 
 def _run_directory(target_path: str, args) -> int:
     results = erase_directory(
@@ -205,7 +187,6 @@ def _run_directory(target_path: str, args) -> int:
         _print_result(r)
     return 0
 
-
 def _run_file(target_path: str, args) -> int:
     if args.method_key == "gutmann":
         _print_colored("  Starting Gutmann 35-pass (this may take a while)...", "yellow")
@@ -220,7 +201,6 @@ def _run_file(target_path: str, args) -> int:
     _print_result(result)
     return 0
 
-
 def _print_target_summary(target_path: str, method_label: str, randomize_name: bool) -> None:
     _print_colored("  Target:  " + target_path, "white")
     _print_colored("  Method:  " + method_label, "cyan")
@@ -228,19 +208,15 @@ def _print_target_summary(target_path: str, method_label: str, randomize_name: b
         _print_colored("  Option:  Randomize filename enabled", "white")
     _print_colored("\n  ⚠ WARNING: This operation is IRREVERSIBLE.\n", "yellow")
 
-
 def _handle_purge_info(args):
     if not args.purge_info:
         return None
-
     print(NIST_PURGE_INFO)
     return 0
-
 
 def _handle_cleanup_logs(args):
     if not args.cleanup_logs:
         return None
-
     _print_colored("  Securely deleting audit log...", "cyan")
     ok = delete_audit_log()
     _print_colored(
@@ -248,7 +224,6 @@ def _handle_cleanup_logs(args):
         "green" if ok else "yellow",
     )
     return 0 if ok else 1
-
 
 def _resolve_target(args, parser):
     if not args.file and not args.dir:
@@ -267,7 +242,6 @@ def _resolve_target(args, parser):
         raise ValueError("directory requires recursive")
 
     return target_path, is_dir
-
 
 def main() -> int:
     parser = _build_arg_parser()
@@ -295,3 +269,14 @@ def main() -> int:
 
     print()
     return _run_directory(target_path, args) if is_dir else _run_file(target_path, args)
+
+# --- KRITIKAL: BAHAGIAN PEMANGGILAN UTAMA ---
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\n\n  [!] Dibatalkan oleh pengguna (Ctrl+C).")
+        sys.exit(130)
+    except Exception as e:
+        print(f"\n  [!] Ralat Kritikal: {e}")
+        sys.exit(1)
