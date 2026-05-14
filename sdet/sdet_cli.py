@@ -245,6 +245,20 @@ def _resolve_target(args, parser):
 
 def main() -> int:
     parser = _build_arg_parser()
+    
+    # --- BLOK PERLINDUNGAN DOUBLE-CLICK (IDIOT-PROOF) ---
+    if len(sys.argv) == 1:
+        print(BANNER)
+        parser.print_help()
+        print("\n  [!] AMARAN: Anda cuba membuka aplikasi ini menggunakan cara GUI (Double-Click).")
+        print("      Ini adalah alat Command-Line (CLI). Sila buka Terminal/PowerShell")
+        print("      dan jalankan fail ini dengan parameter. Contoh:")
+        print("      .\\SDET-CLI-Windows.exe --help")
+        print("      .\\SDET-CLI-Windows.exe --file dokumen_rahsia.txt\n")
+        input("  Tekan ENTER untuk keluar...")
+        return 1
+    # ----------------------------------------------------
+
     args = parser.parse_args()
 
     print(BANNER)
