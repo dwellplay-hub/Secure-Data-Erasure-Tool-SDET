@@ -18,6 +18,10 @@ from typing import Callable, Optional, List
 
 
 AUDIT_LOG_FILE = ".sdet_audit.log"
+RANDOMIZE_FAILED_MSG = "Filename randomization failed, proceeding with original name"
+PERMISSION_DENIED_MSG = "Permission denied"
+FILE_SIZE_CHANGED_MSG = "File size changed during operation"
+FILE_DELETED_DURING_OP = "FILE_DELETED_DURING_OPERATION"
 
 GUTMANN_PATTERNS = [
     b'\x55',
@@ -86,10 +90,10 @@ def _mask_filename(name: str) -> str:
 
 def _write_audit(entry: dict) -> None:
     try:
-        log_dir = Path.home()
-        log_path = log_dir / AUDIT_LOG_FILE
+        # PERBAIKAN: Gunakan Current Working Directory, BUKAN Home Directory
+        log_path = Path(os.getcwd()) / AUDIT_LOG_FILE
         with open(log_path, "a", encoding="utf-8") as f:
-            timestamp = entry.get("timestamp", datetime.datetime.utcnow().isoformat())
+            timestamp = entry.get("timestamp", datetime.datetime.now(datetime.timezone.utc).isoformat())
             sha = entry.get("sha256_path", "N/A")
             method = entry.get("method", "N/A")
             passes = entry.get("passes", "N/A")
@@ -108,32 +112,41 @@ def _is_blacklisted(path: str) -> bool:
 
 
 def _overwrite_pass(filepath: str, pattern: Optional[bytes], file_size: int) -> None:
-    with open(filepath, "r+b") as f:
-        f.seek(0)
-        written = 0
-        chunk_size = 65536
-        while written < file_size:
-            to_write = min(chunk_size, file_size - written)
-            if pattern is None:
-                data = os.urandom(to_write)
-            else:
-                full_reps = (to_write // len(pattern)) + 1
-                data = (pattern * full_reps)[:to_write]
-            f.write(data)
-            written += len(data)
-        f.flush()
-        try:
-            os.fsync(f.fileno())
-        except OSError:
-            pass
+    try:
+        with open(filepath, "r+b") as f:
+            f.seek(0)
+            written = 0
+            chunk_size = 65536
+            while written < file_size:
+                to_write = min(chunk_size, file_size - written)
+                if pattern is None:
+                    data = os.urandom(to_write)
+                else:
+                    full_reps = (to_write // len(pattern)) + 1
+                    data = (pattern * full_reps)[:to_write]
+                f.write(data)
+                written += len(data)
+            f.flush()
+            try:
+                os.fsync(f.fileno())
+            except OSError:
+                pass
+    except IOError as e:
+        logging.warning(f"IO error during overwrite pass: {str(e)}")
+        raise
 
 
-def _randomize_name(filepath: str) -> str:
-    parent = os.path.dirname(filepath)
-    rand_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
-    new_path = os.path.join(parent, rand_name)
-    os.rename(filepath, new_path)
-    return new_path
+def _randomize_name(filepath: str) -> Optional[str]:
+    """Randomize filename. Returns new path on success, None on failure."""
+    try:
+        parent = os.path.dirname(filepath)
+        rand_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
+        new_path = os.path.join(parent, rand_name)
+        os.rename(filepath, new_path)
+        return new_path
+    except OSError as e:
+        logging.warning(f"Failed to randomize filename: {str(e)}")
+        return None
 
 
 def nist_clear(
@@ -155,7 +168,7 @@ def nist_clear(
         "passes": 1,
         "status": "FAILED",
         "sha256_path": _sha256_path(filepath),
-        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "masked_name": _mask_filename(os.path.basename(filepath)),
     }
 
@@ -170,58 +183,103 @@ def nist_clear(
             _write_audit(result)
             return result
 
-        file_size = os.path.getsize(filepath)
-
-        if progress_callback:
-            progress_callback(0.1, "Starting NIST Clear overwrite...")
-
-        if stop_event and stop_event.is_set():
-            result["status"] = "ABORTED"
+        if not _perform_nist_clear_overwrite(filepath, randomize_name, result, progress_callback, stop_event):
             return result
-
-        _overwrite_pass(filepath, None, file_size)
-
-        if progress_callback:
-            progress_callback(0.7, "Overwrite complete. Truncating file...")
-
-        if stop_event and stop_event.is_set():
-            result["status"] = "ABORTED"
-            return result
-
-        with open(filepath, "r+b") as f:
-            f.truncate(0)
-            f.flush()
-            try:
-                os.fsync(f.fileno())
-            except OSError:
-                pass
-
-        if progress_callback:
-            progress_callback(0.85, "Truncated. Removing directory entry...")
-
-        current_path = filepath
-        if randomize_name:
-            current_path = _randomize_name(filepath)
-            if progress_callback:
-                progress_callback(0.92, "Filename randomized.")
-
-        os.unlink(current_path)
-
-        if progress_callback:
-            progress_callback(1.0, "File securely erased.")
 
         result["status"] = "SUCCESS"
         _write_audit(result)
         return result
 
     except PermissionError as e:
-        result["status"] = f"PERMISSION_ERROR"
+        result["status"] = f"PERMISSION_ERROR: {str(e)}"
+        logging.exception(PERMISSION_DENIED_MSG)
+        _write_audit(result)
+        return result
+    except FileNotFoundError as e:
+        result["status"] = f"FILE_NOT_FOUND: {str(e)}"
         _write_audit(result)
         return result
     except Exception as e:
-        result["status"] = f"ERROR"
+        result["status"] = f"ERROR: {type(e).__name__}: {str(e)}"
+        logging.exception("Unexpected error during NIST Clear")
         _write_audit(result)
         return result
+
+
+def _perform_nist_clear_overwrite(
+    filepath: str,
+    randomize_name: bool,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event]
+) -> bool:
+    """Helper function to perform NIST Clear overwrite. Returns True on success."""
+    file_size = os.path.getsize(filepath)
+
+    if progress_callback:
+        progress_callback(0.1, "Starting NIST Clear overwrite...")
+
+    if stop_event and stop_event.is_set():
+        result["status"] = "ABORTED"
+        return False
+
+    # Recheck file size to prevent race condition
+    actual_size = os.path.getsize(filepath)
+    if actual_size != file_size:
+        logging.warning(f"{FILE_SIZE_CHANGED_MSG}: {file_size} -> {actual_size}")
+        file_size = actual_size
+
+    _overwrite_pass(filepath, None, file_size)
+
+    if progress_callback:
+        progress_callback(0.7, "Overwrite complete. Truncating file...")
+
+    if stop_event and stop_event.is_set():
+        result["status"] = "ABORTED"
+        return False
+
+    return _truncate_and_remove_file(filepath, randomize_name, result, progress_callback)
+
+
+def _truncate_and_remove_file(
+    filepath: str,
+    randomize_name: bool,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]]
+) -> bool:
+    """Truncate file and remove it. Returns True on success."""
+    with open(filepath, "r+b") as f:
+        f.truncate(0)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+
+    if progress_callback:
+        progress_callback(0.85, "Truncated. Removing directory entry...")
+
+    current_path = filepath
+    if randomize_name:
+        randomized = _randomize_name(filepath)
+        if randomized:
+            current_path = randomized
+            if progress_callback:
+                progress_callback(0.92, "Filename randomized.")
+        else:
+            logging.warning(RANDOMIZE_FAILED_MSG)
+
+    try:
+        os.unlink(current_path)
+    except OSError as e:
+        result["status"] = f"UNLINK_FAILED: {str(e)}"
+        _write_audit(result)
+        return False
+
+    if progress_callback:
+        progress_callback(1.0, "File securely erased.")
+
+    return True
 
 
 def gutmann_35pass(
@@ -239,7 +297,7 @@ def gutmann_35pass(
         "passes": 35,
         "status": "FAILED",
         "sha256_path": _sha256_path(filepath),
-        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "masked_name": _mask_filename(os.path.basename(filepath)),
     }
 
@@ -254,53 +312,115 @@ def gutmann_35pass(
             _write_audit(result)
             return result
 
-        file_size = os.path.getsize(filepath)
-        total_passes = len(GUTMANN_PATTERNS)
-
-        shuffled_middle = list(GUTMANN_PATTERNS[7:21])
-        random.shuffle(shuffled_middle)
-        patterns = list(GUTMANN_PATTERNS[:7]) + shuffled_middle + list(GUTMANN_PATTERNS[21:])
-
-        for i, pattern in enumerate(patterns):
-            if stop_event and stop_event.is_set():
-                result["status"] = "ABORTED"
-                return result
-
-            _overwrite_pass(filepath, pattern, file_size)
-
-            if progress_callback:
-                pct = (i + 1) / total_passes * 0.9
-                progress_callback(pct, f"Gutmann pass {i+1}/{total_passes}...")
-
-        with open(filepath, "r+b") as f:
-            f.truncate(0)
-            f.flush()
-            try:
-                os.fsync(f.fileno())
-            except OSError:
-                pass
-
-        current_path = filepath
-        if randomize_name:
-            current_path = _randomize_name(filepath)
-
-        os.unlink(current_path)
-
-        if progress_callback:
-            progress_callback(1.0, "Gutmann 35-pass complete.")
+        if not _perform_gutmann_overwrite(filepath, randomize_name, result, progress_callback, stop_event):
+            return result
 
         result["status"] = "SUCCESS"
         _write_audit(result)
         return result
 
-    except PermissionError:
-        result["status"] = "PERMISSION_ERROR"
+    except PermissionError as e:
+        result["status"] = f"PERMISSION_ERROR: {str(e)}"
+        logging.exception(PERMISSION_DENIED_MSG)
         _write_audit(result)
         return result
-    except Exception:
-        result["status"] = "ERROR"
+    except FileNotFoundError as e:
+        result["status"] = f"FILE_NOT_FOUND: {str(e)}"
         _write_audit(result)
         return result
+    except Exception as e:
+        result["status"] = f"ERROR: {type(e).__name__}: {str(e)}"
+        logging.exception("Unexpected error during Gutmann 35-pass")
+        _write_audit(result)
+        return result
+
+
+def _perform_gutmann_overwrite(
+    filepath: str,
+    randomize_name: bool,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event]
+) -> bool:
+    """Helper function to perform Gutmann overwrite. Returns True on success."""
+    total_passes = len(GUTMANN_PATTERNS)
+
+    shuffled_middle = list(GUTMANN_PATTERNS[7:21])
+    random.shuffle(shuffled_middle)
+    patterns = list(GUTMANN_PATTERNS[:7]) + shuffled_middle + list(GUTMANN_PATTERNS[21:])
+
+    if not _perform_overwrite_passes(filepath, patterns, total_passes, result, progress_callback, stop_event):
+        return False
+
+    return _truncate_and_remove_file_gutmann(filepath, randomize_name, result, progress_callback)
+
+
+def _perform_overwrite_passes(
+    filepath: str,
+    patterns: list,
+    total_passes: int,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event]
+) -> bool:
+    """Perform overwrite passes. Returns True on success."""
+    for i, pattern in enumerate(patterns):
+        if stop_event and stop_event.is_set():
+            result["status"] = "ABORTED"
+            return False
+
+        # Recheck file size to prevent race condition
+        try:
+            actual_size = os.path.getsize(filepath)
+            logging.debug(f"File size at pass {i+1}: {actual_size}")
+        except FileNotFoundError:
+            result["status"] = FILE_DELETED_DURING_OP
+            _write_audit(result)
+            return False
+
+        _overwrite_pass(filepath, pattern, actual_size)
+
+        if progress_callback:
+            pct = (i + 1) / total_passes * 0.9
+            progress_callback(pct, f"Gutmann pass {i+1}/{total_passes}...")
+
+    return True
+
+
+def _truncate_and_remove_file_gutmann(
+    filepath: str,
+    randomize_name: bool,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]]
+) -> bool:
+    """Truncate file and remove for Gutmann. Returns True on success."""
+    with open(filepath, "r+b") as f:
+        f.truncate(0)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+
+    current_path = filepath
+    if randomize_name:
+        randomized = _randomize_name(filepath)
+        if randomized:
+            current_path = randomized
+        else:
+            logging.warning(RANDOMIZE_FAILED_MSG)
+
+    try:
+        os.unlink(current_path)
+    except OSError as e:
+        result["status"] = f"UNLINK_FAILED: {str(e)}"
+        _write_audit(result)
+        return False
+
+    if progress_callback:
+        progress_callback(1.0, "Gutmann 35-pass complete.")
+
+    return True
 
 
 def dod_overwrite(
@@ -322,7 +442,7 @@ def dod_overwrite(
         "passes": passes,
         "status": "FAILED",
         "sha256_path": _sha256_path(filepath),
-        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "masked_name": _mask_filename(os.path.basename(filepath)),
     }
 
@@ -337,49 +457,114 @@ def dod_overwrite(
             _write_audit(result)
             return result
 
-        file_size = os.path.getsize(filepath)
-        total = len(patterns)
-
-        for i, pattern in enumerate(patterns):
-            if stop_event and stop_event.is_set():
-                result["status"] = "ABORTED"
-                return result
-
-            _overwrite_pass(filepath, pattern, file_size)
-
-            if progress_callback:
-                pct = (i + 1) / total * 0.9
-                progress_callback(pct, f"DoD pass {i+1}/{total}...")
-
-        with open(filepath, "r+b") as f:
-            f.truncate(0)
-            f.flush()
-            try:
-                os.fsync(f.fileno())
-            except OSError:
-                pass
-
-        current_path = filepath
-        if randomize_name:
-            current_path = _randomize_name(filepath)
-
-        os.unlink(current_path)
-
-        if progress_callback:
-            progress_callback(1.0, f"DoD {passes}-pass complete.")
+        if not _perform_dod_overwrite(filepath, patterns, passes, randomize_name, result, progress_callback, stop_event):
+            return result
 
         result["status"] = "SUCCESS"
         _write_audit(result)
         return result
 
-    except PermissionError:
-        result["status"] = "PERMISSION_ERROR"
+    except PermissionError as e:
+        result["status"] = f"PERMISSION_ERROR: {str(e)}"
+        logging.exception(PERMISSION_DENIED_MSG)
         _write_audit(result)
         return result
-    except Exception:
-        result["status"] = "ERROR"
+    except FileNotFoundError as e:
+        result["status"] = f"FILE_NOT_FOUND: {str(e)}"
         _write_audit(result)
         return result
+    except Exception as e:
+        result["status"] = f"ERROR: {type(e).__name__}: {str(e)}"
+        logging.exception(f"Unexpected error during DoD {passes}-pass")
+        _write_audit(result)
+        return result
+
+
+def _perform_dod_overwrite(
+    filepath: str,
+    patterns: list,
+    passes: int,
+    randomize_name: bool,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event]
+) -> bool:
+    """Helper function to perform DoD overwrite. Returns True on success."""
+    total = len(patterns)
+
+    if not _perform_dod_passes(filepath, patterns, total, result, progress_callback, stop_event):
+        return False
+
+    return _truncate_and_remove_file_dod(filepath, randomize_name, passes, result, progress_callback)
+
+
+def _perform_dod_passes(
+    filepath: str,
+    patterns: list,
+    total: int,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event]
+) -> bool:
+    """Perform DoD overwrite passes. Returns True on success."""
+    for i, pattern in enumerate(patterns):
+        if stop_event and stop_event.is_set():
+            result["status"] = "ABORTED"
+            return False
+
+        # Recheck file size to prevent race condition
+        try:
+            actual_size = os.path.getsize(filepath)
+            logging.debug(f"File size at pass {i+1}: {actual_size}")
+        except FileNotFoundError:
+            result["status"] = FILE_DELETED_DURING_OP
+            _write_audit(result)
+            return False
+
+        _overwrite_pass(filepath, pattern, actual_size)
+
+        if progress_callback:
+            pct = (i + 1) / total * 0.9
+            progress_callback(pct, f"DoD pass {i+1}/{total}...")
+
+    return True
+
+
+def _truncate_and_remove_file_dod(
+    filepath: str,
+    randomize_name: bool,
+    passes: int,
+    result: dict,
+    progress_callback: Optional[Callable[[float, str], None]]
+) -> bool:
+    """Truncate file and remove for DoD. Returns True on success."""
+    with open(filepath, "r+b") as f:
+        f.truncate(0)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+
+    current_path = filepath
+    if randomize_name:
+        randomized = _randomize_name(filepath)
+        if randomized:
+            current_path = randomized
+        else:
+            logging.warning(RANDOMIZE_FAILED_MSG)
+
+    try:
+        os.unlink(current_path)
+    except OSError as e:
+        result["status"] = f"UNLINK_FAILED: {str(e)}"
+        _write_audit(result)
+        return False
+
+    if progress_callback:
+        progress_callback(1.0, f"DoD {passes}-pass complete.")
+
+    return True
 
 
 def erase_directory(
@@ -390,56 +575,124 @@ def erase_directory(
     progress_callback: Optional[Callable[[float, str], None]] = None,
     stop_event: Optional[threading.Event] = None
 ) -> List[dict]:
-    """Recursively erase all files in a directory."""
+    """Recursively erase all files in a directory using streaming to avoid memory issues."""
     results = []
 
     if _is_blacklisted(dirpath):
         return [{"status": "BLOCKED_BLACKLIST", "method": method}]
 
-    all_files = []
-    for root, dirs, files in os.walk(dirpath):
-        for fname in files:
-            all_files.append(os.path.join(root, fname))
-
-    total = len(all_files)
+    # Count total files first (required for progress tracking)
+    total = _count_directory_files(dirpath)
     if total == 0:
         return results
 
-    for idx, fpath in enumerate(all_files):
-        if stop_event and stop_event.is_set():
-            break
+    # Stream files instead of loading all into memory
+    _erase_files_in_directory(dirpath, method, passes, randomize_name, progress_callback, stop_event, results, total)
 
-        file_progress = None
-        if progress_callback:
-            base_pct = idx / total
-            end_pct = (idx + 1) / total
+    # Remove empty directory tree
+    _remove_directory_tree(dirpath)
 
-            def file_progress(pct, msg, base=base_pct, end=end_pct):
-                overall = base + pct * (end - base)
-                progress_callback(overall, msg)
+    return results
 
+
+def _count_directory_files(dirpath: str) -> int:
+    """Count total files in directory. Returns 0 on error."""
+    try:
+        total = 0
+        for root, dirs, files in os.walk(dirpath):
+            total += len(files)
+        return total
+    except Exception:
+        logging.exception("Error counting files in directory")
+        return 0
+
+
+def _erase_files_in_directory(
+    dirpath: str,
+    method: str,
+    passes: int,
+    randomize_name: bool,
+    progress_callback: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event],
+    results: List[dict],
+    total: int
+) -> None:
+    """Erase files in directory with streaming approach."""
+    try:
+        idx = 0
+        for root, dirs, files in os.walk(dirpath):
+            for fname in files:
+                if stop_event and stop_event.is_set():
+                    break
+
+                fpath = os.path.join(root, fname)
+                idx += 1
+
+                file_progress = _create_progress_callback(progress_callback, idx, total)
+                _erase_single_file(method, passes, randomize_name, file_progress, stop_event, results, fpath)
+
+            if stop_event and stop_event.is_set():
+                break
+    except Exception:
+        logging.exception("Error during directory traversal")
+
+
+def _create_progress_callback(
+    progress_callback: Optional[Callable[[float, str], None]],
+    idx: int,
+    total: int
+) -> Optional[Callable[[float, str], None]]:
+    """Create a nested progress callback for file-level progress."""
+    if not progress_callback:
+        return None
+    
+    base_pct = (idx - 1) / total
+    end_pct = idx / total
+
+    def file_progress(pct: float, msg: str) -> None:
+        overall = base_pct + pct * (end_pct - base_pct)
+        progress_callback(overall, msg)
+    
+    return file_progress
+
+
+def _erase_single_file(
+    method: str,
+    passes: int,
+    randomize_name: bool,
+    file_progress: Optional[Callable[[float, str], None]],
+    stop_event: Optional[threading.Event],
+    results: List[dict],
+    fpath: str
+) -> None:
+    """Erase a single file and append result."""
+    try:
         if method == "gutmann":
             r = gutmann_35pass(fpath, randomize_name, file_progress, stop_event)
         elif method == "dod":
             r = dod_overwrite(fpath, passes, randomize_name, file_progress, stop_event)
         else:
             r = nist_clear(fpath, randomize_name, file_progress, stop_event)
-
         results.append(r)
+    except Exception:
+        logging.exception(f"Error erasing file {fpath}")
+        results.append({"status": "ERROR", "filepath": fpath})
 
+
+def _remove_directory_tree(dirpath: str) -> None:
+    """Remove empty directory tree."""
     try:
         import shutil
         shutil.rmtree(dirpath, ignore_errors=True)
     except Exception:
-        pass
-
-    return results
+        logging.warning("Failed to remove directory tree")
 
 
 def delete_audit_log() -> bool:
     """Securely delete the audit log file."""
     try:
-        log_path = Path.home() / AUDIT_LOG_FILE
+        # PERBAIKAN: Padam log di lokasi semasa, bukan Home Directory
+        log_path = Path(os.getcwd()) / AUDIT_LOG_FILE
         if log_path.exists():
             r = nist_clear(str(log_path))
             return r["status"] == "SUCCESS"
