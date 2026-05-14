@@ -250,12 +250,12 @@ def main() -> int:
     if len(sys.argv) == 1:
         print(BANNER)
         parser.print_help()
-        print("\n  [!] AMARAN: Anda cuba membuka aplikasi ini menggunakan cara GUI (Double-Click).")
-        print("      Ini adalah alat Command-Line (CLI). Sila buka Terminal/PowerShell")
-        print("      dan jalankan fail ini dengan parameter. Contoh:")
+        print("\n  [!] WARNING: You tried to open this application using the GUI (Double-Click).")
+        print("      This is a Command-Line (CLI) tool. Please open a Terminal/PowerShell")
+        print("      and run this file with parameters. Example:")
         print("      .\\SDET-CLI-Windows.exe --help")
-        print("      .\\SDET-CLI-Windows.exe --file dokumen_rahsia.txt\n")
-        input("  Tekan ENTER untuk keluar...")
+        print("      .\\SDET-CLI-Windows.exe --file sensitive_document.txt\n")
+        input("  Press ENTER to exit...")
         return 1
     # ----------------------------------------------------
 
