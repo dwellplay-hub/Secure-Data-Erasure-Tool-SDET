@@ -77,6 +77,8 @@ def _sha256_path(path: str) -> str:
 
 
 def _mask_filename(name: str) -> str:
+    if not name:
+        return "***"
     if len(name) <= 3:
         return name[0] + "***"
     visible = max(3, len(name) // 3)
@@ -88,10 +90,13 @@ def _mask_filename(name: str) -> str:
     return name[:visible] + "*" * (len(name) - visible)
 
 
+def _audit_log_path() -> Path:
+    return Path(__file__).resolve().parent / AUDIT_LOG_FILE
+
+
 def _write_audit(entry: dict) -> None:
     try:
-        # PERBAIKAN: Gunakan Current Working Directory, BUKAN Home Directory
-        log_path = Path(os.getcwd()) / AUDIT_LOG_FILE
+        log_path = _audit_log_path()
         with open(log_path, "a", encoding="utf-8") as f:
             timestamp = entry.get("timestamp", datetime.datetime.now(datetime.timezone.utc).isoformat())
             sha = entry.get("sha256_path", "N/A")
@@ -104,9 +109,10 @@ def _write_audit(entry: dict) -> None:
 
 
 def _is_blacklisted(path: str) -> bool:
-    abs_path = os.path.abspath(path)
+    abs_path = os.path.normcase(os.path.abspath(path))
     for bl in SYSTEM_BLACKLIST:
-        if abs_path.lower().startswith(bl.lower()):
+        normalized_blacklist = os.path.normcase(os.path.abspath(bl))
+        if abs_path.startswith(normalized_blacklist):
             return True
     return False
 
@@ -691,8 +697,7 @@ def _remove_directory_tree(dirpath: str) -> None:
 def delete_audit_log() -> bool:
     """Securely delete the audit log file."""
     try:
-        # PERBAIKAN: Padam log di lokasi semasa, bukan Home Directory
-        log_path = Path(os.getcwd()) / AUDIT_LOG_FILE
+        log_path = _audit_log_path()
         if log_path.exists():
             r = nist_clear(str(log_path))
             return r["status"] == "SUCCESS"

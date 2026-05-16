@@ -78,9 +78,7 @@ class SDETApp(ctk.CTk):
         self._is_erasing = False
         self._selected_path = tk.StringVar(value="")
         self._is_directory = False
-        self._ui_log_lines = []
 
-        self._mode = tk.StringVar(value="normal")
         self._method = tk.StringVar(value="nist_clear")
         self._randomize = tk.BooleanVar(value=False)
         self._recursive = tk.BooleanVar(value=False)
@@ -478,8 +476,6 @@ class SDETApp(ctk.CTk):
             self._progress_bar.configure(progress_color=COLOR_SAFE)
 
     def _on_recursive_change(self):
-        # The recursive switch is user-facing, so log the change
-        # rather than leaving the callback empty.
         if self._recursive.get():
             self._log("Recursive deletion enabled.", COLOR_INFO)
         else:
@@ -504,7 +500,16 @@ class SDETApp(ctk.CTk):
     def _log(self, message: str, color: str = None):
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self._log_textbox.configure(state="normal")
-        self._log_textbox.insert("end", f"[{timestamp}] {message}\n")
+        text = f"[{timestamp}] {message}\n"
+        if color:
+            try:
+                tag_name = color.replace("#", "hex_")
+                self._log_textbox.tag_configure(tag_name, foreground=color)
+                self._log_textbox.insert("end", text, tag_name)
+            except Exception:
+                self._log_textbox.insert("end", text)
+        else:
+            self._log_textbox.insert("end", text)
         self._log_textbox.configure(state="disabled")
         self._log_textbox.see("end")
 
@@ -644,6 +649,15 @@ class SDETApp(ctk.CTk):
         status = result.get("status")
         masked = result.get("masked_name", "???")
 
+        # ---------------------------------------------------------
+        # FIX: POPUP BOX FOR SILENT FAILURE (FILE)
+        # ---------------------------------------------------------
+        if status == "BLOCKED_BLACKLIST":
+            self.after(0, lambda: messagebox.showwarning(
+                "Security Blocked",
+                "SECURITY WARNING: This path is on the Blacklist because it is a critical system path.\n\nThe operation has been automatically aborted to protect Windows from damage."
+                ))
+
         status_map = {
             "SUCCESS": (
                 f"✔ {masked} — Securely erased.",
@@ -675,6 +689,22 @@ class SDETApp(ctk.CTk):
             progress_callback=progress,
             stop_event=self._stop_event,
         )
+
+        # ---------------------------------------------------------
+        # FIX: POPUP BOX FOR SILENT FAILURE (FOLDER/DIR)
+        # ---------------------------------------------------------
+        if results and results[0].get("status") == "BLOCKED_BLACKLIST":
+            self.after(0, lambda: messagebox.showwarning(
+                "Security Blocked",
+                "SECURITY WARNING: " \
+                "This directory is on the Blacklist because it contains critical system files.\n\nThe operation has been automatically aborted to protect Windows."
+            ))
+            self.after(0, lambda: self._log(f"✖ BLOCKED: Protected system directory ({path})", COLOR_DANGER))
+            return
+
+        if not results:
+            self.after(0, lambda: self._log("⚠ No files found to erase in directory.", COLOR_DIM))
+            return
 
         success = sum(1 for r in results if r.get("status") == "SUCCESS")
         failed = len(results) - success
