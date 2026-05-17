@@ -39,22 +39,24 @@ jobs:
     # PEMBINAAN CLI (COMMAND-LINE INTERFACE)
     # KRITIKAL: Flag --console memastikan ia tidak bisu di Windows
     # Flag --clean membuang sisa cache (bulletproof build)
+    # Laluan disasarkan kepada cli.py
     # ---------------------------------------------------------
     - name: Build CLI (PyInstaller)
       run: >
         pyinstaller --clean --onefile --console 
         --name SDET-CLI-${{ runner.os }} 
-        sdet/sdet_cli.py
+        cli.py
 
     # ---------------------------------------------------------
     # PEMBINAAN GUI (GRAPHICAL USER INTERFACE)
     # KRITIKAL: Flag --windowed menyembunyikan terminal hitam
+    # Laluan disasarkan kepada main.py
     # ---------------------------------------------------------
     - name: Build GUI (PyInstaller)
       run: >
         pyinstaller --clean --onefile --windowed --collect-all customtkinter 
         --name SDET-GUI-${{ runner.os }} 
-        sdet/sdet_gui.py
+        main.py
 
     # KHAS UNTUK MAC: Mac menghasilkan folder .app untuk GUI, kita perlu zipkannya
     - name: Zip macOS App Bundle (macOS Only)
