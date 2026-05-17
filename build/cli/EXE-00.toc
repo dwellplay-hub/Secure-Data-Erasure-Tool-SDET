@@ -267,7 +267,7 @@
  [],
  False,
  False,
- 1778986482,
+ 1778987291,
  [('run.exe',
    'd:\\Projek '
    'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
