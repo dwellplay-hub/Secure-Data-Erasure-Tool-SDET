@@ -16,6 +16,10 @@ import logging
 from pathlib import Path
 from typing import Callable, Optional, List
 
+# <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+if os.name == 'nt':
+    import msvcrt
+# ---------------------------------------------------------
 
 AUDIT_LOG_FILE = ".sdet_audit.log"
 RANDOMIZE_FAILED_MSG = "Filename randomization failed, proceeding with original name"
@@ -71,6 +75,18 @@ SYSTEM_BLACKLIST = [
     "C:\\System Volume Information", "C:\\ProgramData",
 ]
 
+# <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+def _lock_file(f):
+    """
+    Memaksa kunci eksklusif pada fail di Windows untuk mengelakkan Race Condition.
+    Akan melontarkan PermissionError jika fail sedang digunakan oleh proses lain.
+    """
+    if os.name == 'nt':
+        try:
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+        except OSError:
+            raise PermissionError("File is locked by another process (Race Condition Prevented).")
+# ---------------------------------------------------------
 
 def _sha256_path(path: str) -> str:
     return hashlib.sha256(path.encode("utf-8")).hexdigest()
@@ -120,6 +136,7 @@ def _is_blacklisted(path: str) -> bool:
 def _overwrite_pass(filepath: str, pattern: Optional[bytes], file_size: int) -> None:
     try:
         with open(filepath, "r+b") as f:
+            _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
             f.seek(0)
             written = 0
             chunk_size = 65536
@@ -255,6 +272,7 @@ def _truncate_and_remove_file(
 ) -> bool:
     """Truncate file and remove it. Returns True on success."""
     with open(filepath, "r+b") as f:
+        _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
         f.truncate(0)
         f.flush()
         try:
@@ -401,6 +419,7 @@ def _truncate_and_remove_file_gutmann(
 ) -> bool:
     """Truncate file and remove for Gutmann. Returns True on success."""
     with open(filepath, "r+b") as f:
+        _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
         f.truncate(0)
         f.flush()
         try:
@@ -545,6 +564,7 @@ def _truncate_and_remove_file_dod(
 ) -> bool:
     """Truncate file and remove for DoD. Returns True on success."""
     with open(filepath, "r+b") as f:
+        _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
         f.truncate(0)
         f.flush()
         try:
