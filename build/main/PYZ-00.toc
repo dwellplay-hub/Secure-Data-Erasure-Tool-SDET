@@ -3,6 +3,10 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\__future__.py',
    'PYMODULE'),
+  ('_aix_support',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\_aix_support.py',
+   'PYMODULE'),
   ('_colorize',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\_colorize.py',
@@ -78,6 +82,234 @@
   ('csv',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\csv.py',
+   'PYMODULE'),
+  ('ctypes',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\__init__.py',
+   'PYMODULE'),
+  ('ctypes._aix',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\_aix.py',
+   'PYMODULE'),
+  ('ctypes._endian',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\_endian.py',
+   'PYMODULE'),
+  ('ctypes.macholib',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\macholib\\__init__.py',
+   'PYMODULE'),
+  ('ctypes.macholib.dyld',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\macholib\\dyld.py',
+   'PYMODULE'),
+  ('ctypes.macholib.dylib',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\macholib\\dylib.py',
+   'PYMODULE'),
+  ('ctypes.macholib.framework',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\macholib\\framework.py',
+   'PYMODULE'),
+  ('ctypes.util',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\util.py',
+   'PYMODULE'),
+  ('ctypes.wintypes',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\wintypes.py',
+   'PYMODULE'),
+  ('customtkinter',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.ctk_input_dialog',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\ctk_input_dialog.py',
+   'PYMODULE'),
+  ('customtkinter.windows.ctk_tk',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\ctk_tk.py',
+   'PYMODULE'),
+  ('customtkinter.windows.ctk_toplevel',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\ctk_toplevel.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.appearance_mode',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\appearance_mode\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.appearance_mode.appearance_mode_base_class',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\appearance_mode\\appearance_mode_base_class.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.appearance_mode.appearance_mode_tracker',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\appearance_mode\\appearance_mode_tracker.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.core_rendering',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\core_rendering\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.core_rendering.ctk_canvas',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\core_rendering\\ctk_canvas.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.core_rendering.draw_engine',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\core_rendering\\draw_engine.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.core_widget_classes',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\core_widget_classes\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.core_widget_classes.ctk_base_class',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\core_widget_classes\\ctk_base_class.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.core_widget_classes.dropdown_menu',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\core_widget_classes\\dropdown_menu.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_button',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_button.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_checkbox',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_checkbox.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_combobox',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_combobox.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_entry',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_entry.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_frame',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_frame.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_label',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_label.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_optionmenu',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_optionmenu.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_progressbar',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_progressbar.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_radiobutton',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_radiobutton.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_scrollable_frame',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_scrollable_frame.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_scrollbar',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_scrollbar.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_segmented_button',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_segmented_button.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_slider',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_slider.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_switch',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_switch.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_tabview',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_tabview.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.ctk_textbox',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\ctk_textbox.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.font',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\font\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.font.ctk_font',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\font\\ctk_font.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.font.font_manager',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\font\\font_manager.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.image',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\image\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.image.ctk_image',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\image\\ctk_image.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.scaling',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\scaling\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.scaling.scaling_base_class',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\scaling\\scaling_base_class.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.scaling.scaling_tracker',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\scaling\\scaling_tracker.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.theme',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\theme\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.theme.theme_manager',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\theme\\theme_manager.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.utility',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\utility\\__init__.py',
+   'PYMODULE'),
+  ('customtkinter.windows.widgets.utility.utility_functions',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\customtkinter\\windows\\widgets\\utility\\utility_functions.py',
+   'PYMODULE'),
+  ('darkdetect',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\darkdetect\\__init__.py',
+   'PYMODULE'),
+  ('darkdetect._dummy',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\darkdetect\\_dummy.py',
+   'PYMODULE'),
+  ('darkdetect._linux_detect',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\darkdetect\\_linux_detect.py',
+   'PYMODULE'),
+  ('darkdetect._mac_detect',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\darkdetect\\_mac_detect.py',
+   'PYMODULE'),
+  ('darkdetect._windows_detect',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\darkdetect\\_windows_detect.py',
    'PYMODULE'),
   ('dataclasses',
    'C:\\Program '
@@ -331,6 +563,14 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\opcode.py',
    'PYMODULE'),
+  ('packaging',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\packaging\\__init__.py',
+   'PYMODULE'),
+  ('packaging.version',
+   'd:\\Projek '
+   'FYP\\Secure-Data-Erasure-Tool-SDET\\.venv\\Lib\\site-packages\\packaging\\version.py',
+   'PYMODULE'),
   ('pathlib',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\pathlib\\__init__.py',
@@ -347,6 +587,10 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\pickle.py',
    'PYMODULE'),
+  ('platform',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\platform.py',
+   'PYMODULE'),
   ('pprint',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\pprint.py',
@@ -362,6 +606,12 @@
   ('random',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\random.py',
+   'PYMODULE'),
+  ('sdet',
+   'D:\\Projek FYP\\Secure-Data-Erasure-Tool-SDET\\sdet\\__init__.py',
+   'PYMODULE'),
+  ('sdet.erasure_engine',
+   'D:\\Projek FYP\\Secure-Data-Erasure-Tool-SDET\\sdet\\erasure_engine.py',
    'PYMODULE'),
   ('selectors',
    'C:\\Program '
@@ -395,6 +645,10 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\subprocess.py',
    'PYMODULE'),
+  ('sysconfig',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\sysconfig\\__init__.py',
+   'PYMODULE'),
   ('tarfile',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tarfile.py',
@@ -410,6 +664,42 @@
   ('threading',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\threading.py',
+   'PYMODULE'),
+  ('tkinter',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\__init__.py',
+   'PYMODULE'),
+  ('tkinter.commondialog',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\commondialog.py',
+   'PYMODULE'),
+  ('tkinter.constants',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\constants.py',
+   'PYMODULE'),
+  ('tkinter.dialog',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\dialog.py',
+   'PYMODULE'),
+  ('tkinter.filedialog',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\filedialog.py',
+   'PYMODULE'),
+  ('tkinter.font',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\font.py',
+   'PYMODULE'),
+  ('tkinter.messagebox',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\messagebox.py',
+   'PYMODULE'),
+  ('tkinter.simpledialog',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\simpledialog.py',
+   'PYMODULE'),
+  ('tkinter.ttk',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3568.0_x64__qbz5n2kfra8p0\\Lib\\tkinter\\ttk.py',
    'PYMODULE'),
   ('token',
    'C:\\Program '
