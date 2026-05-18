@@ -9,6 +9,7 @@ Usage:
 
 import sys
 import os
+import shutil
 import argparse
 import textwrap
 
@@ -104,11 +105,19 @@ def _cli_progress(pct: float, msg: str) -> None:
     filled = int(bar_len * pct)
     bar = "█" * filled + "░" * (bar_len - filled)
     
-    # ---------------------------------------------------------
-    # DYNAMIC RENDER PATCH: Elak teks terpotong & bertimbun
-    # ---------------------------------------------------------
-    # \033[K adalah arahan ANSI untuk memadam teks lama di sebelah kanan kursor
-    sys.stdout.write(f"\r  [{bar}] {int(pct * 100):3d}%  {msg}\033[K")
+    # --- DYNAMIC TERMINAL WIDTH PATCH ---
+    # Baca lebar terminal pengguna (default 80 jika gagal dibaca)
+    term_width = shutil.get_terminal_size((80, 20)).columns
+    
+    # Kira ruang yang tinggal untuk teks mesej.
+    # 52 adalah jumlah purata ruang yang diambil oleh "  [...bar...] 100%  "
+    max_msg_len = max(10, term_width - 52)
+    
+    # Potong teks HANYA jika ia melebihi baki ruang skrin (elak line wrapping)
+    safe_msg = msg[:max_msg_len]
+    
+    # \033[K memadam sisa teks lama
+    sys.stdout.write(f"\r  [{bar}] {int(pct * 100):3d}%  {safe_msg}\033[K")
     sys.stdout.flush()
     if pct >= 1.0:
         print()
