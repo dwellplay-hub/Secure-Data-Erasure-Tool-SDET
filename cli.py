@@ -103,7 +103,12 @@ def _cli_progress(pct: float, msg: str) -> None:
     bar_len = 40
     filled = int(bar_len * pct)
     bar = "█" * filled + "░" * (bar_len - filled)
-    sys.stdout.write(f"\r  [{bar}] {int(pct * 100):3d}%  {msg[:40]:<40}")
+    
+    # ---------------------------------------------------------
+    # DYNAMIC RENDER PATCH: Elak teks terpotong & bertimbun
+    # ---------------------------------------------------------
+    # \033[K adalah arahan ANSI untuk memadam teks lama di sebelah kanan kursor
+    sys.stdout.write(f"\r  [{bar}] {int(pct * 100):3d}%  {msg}\033[K")
     sys.stdout.flush()
     if pct >= 1.0:
         print()
