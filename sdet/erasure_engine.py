@@ -108,7 +108,19 @@ def _mask_filename(name: str) -> str:
 
 
 def _audit_log_path() -> Path:
-    return Path(__file__).resolve().parent / AUDIT_LOG_FILE
+    """
+    KUNCI KESELAMATAN (DISTRIBUTION PATCH):
+    Memastikan fail log sentiasa dicipta di folder tempat perisian dieksekusi,
+    sama ada berjalan sebagai skrip mentah .py atau fail kompilasi .exe (PyInstaller).
+    """
+    if getattr(sys, 'frozen', False):
+        # Jika berjalan sebagai .exe, guna folder tempat fail .exe itu berada
+        base_dir = Path(sys.executable).parent
+    else:
+        # Jika berjalan sebagai skrip Python biasa, guna folder sdet/
+        base_dir = Path(__file__).resolve().parent
+        
+    return base_dir / AUDIT_LOG_FILE
 
 
 def _write_audit(entry: dict) -> None:
