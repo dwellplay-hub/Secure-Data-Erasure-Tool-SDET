@@ -9,6 +9,7 @@ Usage:
 
 import sys
 import os
+import time
 import shutil
 import argparse
 import textwrap
@@ -100,25 +101,32 @@ def _confirm(prompt: str) -> bool:
     except (EOFError, KeyboardInterrupt):
         return False
 
+# Pembolehubah global untuk menjejak masa kemas kini terminal yang terakhir
+_last_update_time = 0.0
+
 def _cli_progress(pct: float, msg: str) -> None:
+    global _last_update_time
+    current_time = time.time()
+    
+    # --- UI THROTTLING PATCH ---
+    # Jika belum 100%, halang terminal dari dikemas kini lebih kerap daripada 0.05 saat (50ms).
+    # Ini menghilangkan kelipan (flickering) dan melajukan proses pemadaman fail!
+    if pct < 1.0 and (current_time - _last_update_time) < 0.05:
+        return
+        
+    _last_update_time = current_time
+
     bar_len = 40
     filled = int(bar_len * pct)
     bar = "█" * filled + "░" * (bar_len - filled)
     
-    # --- DYNAMIC TERMINAL WIDTH PATCH ---
-    # Baca lebar terminal pengguna (default 80 jika gagal dibaca)
     term_width = shutil.get_terminal_size((80, 20)).columns
-    
-    # Kira ruang yang tinggal untuk teks mesej.
-    # 52 adalah jumlah purata ruang yang diambil oleh "  [...bar...] 100%  "
     max_msg_len = max(10, term_width - 52)
-    
-    # Potong teks HANYA jika ia melebihi baki ruang skrin (elak line wrapping)
     safe_msg = msg[:max_msg_len]
     
-    # \033[K memadam sisa teks lama
     sys.stdout.write(f"\r  [{bar}] {int(pct * 100):3d}%  {safe_msg}\033[K")
     sys.stdout.flush()
+    
     if pct >= 1.0:
         print()
 
