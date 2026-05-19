@@ -306,7 +306,7 @@ def main() -> int:
 
     # <--- PATCH S05: Padam sejarah terminal dengan pantas untuk elak intipan arahan
     if not args.purge_info and not args.cleanup_logs:
-        os.system('cls' if os.name == 'nt' else 'clear')
+        os.system('cls' if os.name == 'nt' else 'clear')  # nosec B605
 
     print(BANNER)
 

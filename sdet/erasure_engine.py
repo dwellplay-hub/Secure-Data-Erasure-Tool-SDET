@@ -8,6 +8,7 @@ import os
 import sys
 import struct
 import random
+import secrets
 import string
 import hashlib
 import datetime
@@ -163,7 +164,8 @@ def _randomize_name(filepath: str) -> Optional[str]:
     """Randomize filename. Returns new path on success, None on failure."""
     try:
         parent = os.path.dirname(filepath)
-        rand_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
+        # Gunakan secrets (CSPRNG) menggantikan random untuk keselamatan gred industri
+        rand_name = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(16))
         new_path = os.path.join(parent, rand_name)
         os.rename(filepath, new_path)
         return new_path
