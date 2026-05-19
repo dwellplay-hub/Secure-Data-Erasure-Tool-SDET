@@ -372,7 +372,11 @@ def _perform_gutmann_overwrite(
     total_passes = len(GUTMANN_PATTERNS)
 
     shuffled_middle = list(GUTMANN_PATTERNS[7:21])
-    random.shuffle(shuffled_middle)
+    
+    # KUNCI KESELAMATAN (CSPRNG): Menggunakan secrets.SystemRandom() 
+    # untuk menyusun corak secara rawak kriptografi yang tidak boleh diramal.
+    secrets.SystemRandom().shuffle(shuffled_middle)
+    
     patterns = list(GUTMANN_PATTERNS[:7]) + shuffled_middle + list(GUTMANN_PATTERNS[21:])
 
     if not _perform_overwrite_passes(filepath, patterns, total_passes, result, progress_callback, stop_event):
