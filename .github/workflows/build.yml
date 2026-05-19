@@ -22,11 +22,15 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
+    # ---------------------------------------------------------
+    # KUNCI KESELAMATAN (SHA PINNING): 
+    # Menggunakan SHA hash untuk mengelak Serangan Rantaian Bekalan
+    # ---------------------------------------------------------
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
     - name: Set up Python 3.11
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
       with:
         python-version: '3.11'
 
@@ -35,30 +39,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install customtkinter pyinstaller
 
-    # ---------------------------------------------------------
-    # PEMBINAAN CLI (COMMAND-LINE INTERFACE)
-    # KRITIKAL: Flag --console memastikan ia tidak bisu di Windows
-    # Flag --clean membuang sisa cache (bulletproof build)
-    # Laluan disasarkan kepada cli.py
-    # ---------------------------------------------------------
     - name: Build CLI (PyInstaller)
       run: >
         pyinstaller --clean --onefile --console 
         --name SDET-CLI-${{ runner.os }} 
         cli.py
 
-    # ---------------------------------------------------------
-    # PEMBINAAN GUI (GRAPHICAL USER INTERFACE)
-    # KRITIKAL: Flag --windowed menyembunyikan terminal hitam
-    # Laluan disasarkan kepada main.py
-    # ---------------------------------------------------------
     - name: Build GUI (PyInstaller)
       run: >
         pyinstaller --clean --onefile --windowed --collect-all customtkinter 
         --name SDET-GUI-${{ runner.os }} 
         main.py
 
-    # KHAS UNTUK MAC: Mac menghasilkan folder .app untuk GUI, kita perlu zipkannya
     - name: Zip macOS App Bundle (macOS Only)
       if: runner.os == 'macOS'
       run: |
@@ -66,16 +58,14 @@ jobs:
         zip -r SDET-GUI-macOS.zip SDET-GUI-macOS.app
         rm -rf SDET-GUI-macOS.app
 
-    # Simpan perisian yang dah siap ke tab 'Actions' (Artifacts)
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@1746f4ab65b179e0ea60a494b83293b640dd5bba # v4.3.3
       with:
         name: SDET-Binaries-${{ runner.os }}
         path: dist/*
 
-    # Hantar terus ke bahagian 'Releases' jika anda push menggunakan tag (v1.0.0)
     - name: Publish to GitHub Releases
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.0.8
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: dist/*
