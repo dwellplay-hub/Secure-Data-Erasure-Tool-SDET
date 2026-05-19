@@ -101,33 +101,48 @@ def _confirm(prompt: str) -> bool:
     except (EOFError, KeyboardInterrupt):
         return False
 
-# Pembolehubah global untuk menjejak masa kemas kini terminal yang terakhir
+# Pembolehubah global untuk menjejak kemas kini dan cache terminal
 _last_update_time = 0.0
+_cached_term_width = 80
+_width_last_check = 0.0
 
 def _cli_progress(pct: float, msg: str) -> None:
-    global _last_update_time
+    global _last_update_time, _cached_term_width, _width_last_check
     current_time = time.time()
     
-    # --- UI THROTTLING PATCH ---
-    # Jika belum 100%, halang terminal dari dikemas kini lebih kerap daripada 0.05 saat (50ms).
-    # Ini menghilangkan kelipan (flickering) dan melajukan proses pemadaman fail!
-    if pct < 1.0 and (current_time - _last_update_time) < 0.05:
+    is_done = (pct >= 1.0)
+    
+    # --- 1. SUPER THROTTLING (10 FPS) ---
+    # Hadkan kemas kini skrin kepada 0.1 saat (10 frame sesaat).
+    # Ini memberi ruang 100% kepada CPU untuk fokus memadam data!
+    if not is_done and (current_time - _last_update_time) < 0.1:
         return
         
     _last_update_time = current_time
+
+    # --- 2. TERMINAL SIZE CACHING (ELAK LAG) ---
+    # Tanya OS saiz terminal hanya 1 kali setiap saat.
+    if (current_time - _width_last_check) > 1.0:
+        _cached_term_width = shutil.get_terminal_size((80, 20)).columns
+        _width_last_check = current_time
 
     bar_len = 40
     filled = int(bar_len * pct)
     bar = "█" * filled + "░" * (bar_len - filled)
     
-    term_width = shutil.get_terminal_size((80, 20)).columns
-    max_msg_len = max(10, term_width - 52)
+    max_msg_len = max(10, _cached_term_width - 52)
     safe_msg = msg[:max_msg_len]
     
-    sys.stdout.write(f"\r  [{bar}] {int(pct * 100):3d}%  {safe_msg}\033[K")
+    # --- 3. CURSOR HIDING (HILANGKAN KELIPAN) ---
+    # \033[?25l = Sorok kursor terminal semasa progress berjalan
+    # \033[?25h = Munculkan kursor semula bila siap 100%
+    hide_cursor = "\033[?25l"
+    show_cursor = "\033[?25h" if is_done else ""
+    
+    sys.stdout.write(f"\r{hide_cursor}  [{bar}] {int(pct * 100):3d}%  {safe_msg}\033[K{show_cursor}")
     sys.stdout.flush()
     
-    if pct >= 1.0:
+    if is_done:
         print()
 
 def _build_arg_parser() -> argparse.ArgumentParser:
