@@ -192,19 +192,17 @@ def nist_clear(
     progress_callback: Optional[Callable[[float, str], None]] = None,
     stop_event: Optional[threading.Event] = None
 ) -> dict:
-    """
-    NIST SP 800-88 Rev. 2 CLEAR sanitization.
-    - 1-pass random overwrite (user-addressable sectors)
-    - fsync/flush for write-through confirmation
-    - File truncation to zero
-    - Directory entry removal (unlink)
-    - Optional filename randomization
-    """
+    # ╔══════════════════════════════════════════════════════════════════════╗
+    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
+    # ║ Memaksa laluan input menjadi mutlak & bersih pada mili-saat pertama!  ║
+    # ╚══════════════════════════════════════════════════════════════════════╝
+    filepath = os.path.normpath(os.path.abspath(filepath))
+
     result = {
         "method": "NIST_CLEAR",
         "passes": 1,
         "status": "FAILED",
-        "sha256_path": _sha256_path(filepath),
+        "sha256_path": _sha256_path(filepath), # <--- Selamat: Log audit kini dijamin merekod laluan mutlak tulen
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "masked_name": _mask_filename(os.path.basename(filepath)),
     }
@@ -330,6 +328,12 @@ def gutmann_35pass(
     Gutmann 35-pass overwrite — LEGACY EDUCATIONAL ONLY.
     Not recommended for SSDs. Obsolete per NIST SP 800-88.
     """
+    # ╔══════════════════════════════════════════════════════════════════════╗
+    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
+    # ║ Memaksa laluan input menjadi mutlak & bersih pada mili-saat pertama!  ║
+    # ╚══════════════════════════════════════════════════════════════════════╝
+    filepath = os.path.normpath(os.path.abspath(filepath))
+
     result = {
         "method": "GUTMANN_35PASS",
         "passes": 35,
@@ -477,6 +481,12 @@ def dod_overwrite(
     DoD 3-pass or 7-pass overwrite — DEPRECATED / EDUCATIONAL ONLY.
     Obsolete per NIST SP 800-88 Rev. 2.
     """
+    # ╔══════════════════════════════════════════════════════════════════════╗
+    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
+    # ║ Memaksa laluan input menjadi mutlak & bersih pada mili-saat pertama!  ║
+    # ╚══════════════════════════════════════════════════════════════════════╝
+    filepath = os.path.normpath(os.path.abspath(filepath))
+
     patterns = DOD_3PASS if passes == 3 else DOD_7PASS
     method_name = f"DOD_{passes}PASS"
 
@@ -620,6 +630,12 @@ def erase_directory(
     stop_event: Optional[threading.Event] = None
 ) -> List[dict]:
     """Recursively erase all files in a directory using streaming to avoid memory issues."""
+    # ╔══════════════════════════════════════════════════════════════════════╗
+    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
+    # ║ Memaksa laluan folder menjadi mutlak & bersih pada mili-saat pertama!  ║
+    # ╚══════════════════════════════════════════════════════════════════════╝
+    dirpath = os.path.normpath(os.path.abspath(dirpath))
+
     results = []
 
     if _is_blacklisted(dirpath):
