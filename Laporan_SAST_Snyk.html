@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Snyk test report</title>
-  <meta name="description" content="Found 2 issues">
+  <meta name="description" content="Found 6 issues">
   <base target="_blank">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/snyk/image/upload/v1468845142/favicon/favicon.png"
     sizes="194x194">
@@ -607,7 +607,7 @@
           </svg>
         </a>
         <div class="test-meta">
-          <p class="timestamp">May 19th 2026, 7:33:15 am (UTC+00:00)</p>
+          <p class="timestamp">May 19th 2026, 1:09:37 pm (UTC+00:00)</p>
           <div class="filepath" title="D:\Projek FYP\Secure-Data-Erasure-Tool-SDET">Source: D:\Projek FYP\Secure-Data-Erasure-Tool-SDET</div>
         </div>
       </div>
@@ -628,7 +628,7 @@
               
             </div>
             <div class="meta-count">
-              <span class="severity-icon severity-icon--low"></span> <span><strong>1</strong> low issues</span>
+              <span class="severity-icon severity-icon--low"></span> <span><strong>5</strong> low issues</span>
               
             </div>
           </div>
@@ -636,7 +636,7 @@
         <div class="source-panel">
           <span class="source-panel__heading">Scan Coverage</span>
           <ul class="scan-coverage">
-            <li class="type">.html files: <strong>4</strong></li><li class="type">.mjs files: <strong>1</strong></li><li class="type">.py files: <strong>3</strong></li><li class="type">.ts files: <strong>23</strong></li><li class="type">.tsx files: <strong>58</strong></li><li class="type">.py files: <strong>1</strong></li>
+            <li class="type">.html files: <strong>5</strong></li><li class="type">.mjs files: <strong>1</strong></li><li class="type">.py files: <strong>4</strong></li><li class="type">.ts files: <strong>23</strong></li><li class="type">.tsx files: <strong>58</strong></li>
           </ul>            
         </div>
       </div>
@@ -701,10 +701,1062 @@
               <header class="card__header">
                   <div class="card__header__main">
                       <div class="severity-icon severity-icon--low"></div>
-                      <h2 class="card__title">Sensitive Cookie in HTTPS Session Without &#x27;Secure&#x27; Attribute</h2>
+                      <h2 class="card__title">Path Traversal</h2>
                       <div class="card__actions">
                           <label for="tab-dataflow-1" class="card__action">Data Flow</label>
                           <label for="tab-fix-1" class="card__action">Fix Analysis</label>
+                      </div>
+                  </div>
+                  <ul class="card__meta">
+                      <li class="card__meta__item">SNYK-CODE</li>
+                      <li class="card__meta__item">CWE-23</li>
+                      <li class="card__meta__item">PT</li>
+                  </ul>
+              </header>
+              <div class="card__section">
+                  <div class="card__summary severity--low">
+                      <p>Unsanitized input from a command line argument flows into shutil.rmtree, where it is used as a path. This may result in a Path Traversal vulnerability and allow an attacker to remove arbitrary files.</p>
+                      <div class="file-location">Found in: <strong>cli.py (line : 212)</strong></div>
+                  </div>
+                  <div class="card__panel dataflow">
+                      <h2 class="card__panel__heading"><span class="heading-char">⇣</span> Data Flow</h2>
+                      <div class="dataflow__filename"> cli.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          <span class="dataflow__badge" title="Data is 'tainted' if it comes from an insecure source such as a file, the network, or the user. This tainted data is passed to a sensitive sink, as described below.">Source</span>
+                          <span class="dataflow__step">0</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          
+                          <span class="dataflow__step">1</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">args &#x3D; parser.parse_args()</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">2</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:47</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        target_path, is_dir &#x3D; _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser)</span></div>
+                          
+                          <span class="dataflow__step">3</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">271:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser):</span></div>
+                          
+                          <span class="dataflow__step">4</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.</span><span class="dataflow__codesuffix">file and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">5</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.file </span><span class="dataflow__codesuffix">and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">6</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    target_path &#x3D; <br /></span><span class="marker">args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">7</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">target_path &#x3D; args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">8</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">287:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir</span></div>
+                          
+                          <span class="dataflow__step">9</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir &#x3D; _resolve_target(args, parser)</span></div>
+                          
+                          <span class="dataflow__step">10</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">325:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _print_target_summary(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> method_label, args.randomize_name)</span></div>
+                          
+                          <span class="dataflow__step">11</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">244:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _print_target_summary(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> method_label: str, randomize_name: bool) -&gt; None:</span></div>
+                          
+                          <span class="dataflow__step">12</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">332:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _run_directory(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args) if is_dir else _run_file(target_path, args)</span></div>
+                          
+                          <span class="dataflow__step">13</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">211:20</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _run_directory(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> args) -&gt; int:</span></div>
+                          
+                          <span class="dataflow__step">14</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">213:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">15</span>
+                      </div>
+                      <div class="dataflow__filename"> sdet/erasure_engine.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">603:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">dirpath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">16</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">613:24</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if _is_blacklisted(<br /></span><span class="marker">dirpath)</span><span class="dataflow__codesuffix">:</span></div>
+                          
+                          <span class="dataflow__step">17</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">128:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _is_blacklisted(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; bool:</span></div>
+                          
+                          <span class="dataflow__step">18</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">617:36</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    total &#x3D; _count_directory_files(<br /></span><span class="marker">dirpath)</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">19</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">630:28</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _count_directory_files(<br /></span><span class="marker">dirpath: str)</span><span class="dataflow__codesuffix"> -&gt; int:</span></div>
+                          
+                          <span class="dataflow__step">20</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">622:31</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _erase_files_in_directory(<br /></span><span class="marker">dirpath,</span><span class="dataflow__codesuffix"> method, passes, randomize_name, progress_callback, stop_event, results, total)</span></div>
+                          
+                          <span class="dataflow__step">21</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">643:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">dirpath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">22</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">625:28</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _remove_directory_tree(<br /></span><span class="marker">dirpath)</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">23</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">714:28</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _remove_directory_tree(<br /></span><span class="marker">dirpath: str)</span><span class="dataflow__codesuffix"> -&gt; None:</span></div>
+                          
+                          <span class="dataflow__step">24</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">718:23</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        shutil.rmtree(<br /></span><span class="marker">dirpath,</span><span class="dataflow__codesuffix"> ignore_errors&#x3D;True)</span></div>
+                          
+                          <span class="dataflow__step">25</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">718:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">shutil.rmtree(</span><span class="dataflow__codesuffix">dirpath, ignore_errors&#x3D;True)</span></div>
+                          <span class="dataflow__badge" title="Sinks are the operations that must receive clean data and that you wouldn't want an attacker to be able to manipulate.">Sink</span>
+                          <span class="dataflow__step">26</span>
+                      </div>
+                  </div>
+                  <div class="card__panel fix-analysis">
+                      <h2 class="card__panel__heading"><span class="heading-char">✓</span> Fix Analysis</h2>
+                      <div class="card__panel__markdown"><h2 id="details">Details</h2>
+          <p>A Directory Traversal attack (also known as path traversal) aims to access files and directories that are stored outside the intended folder. By manipulating files with &quot;dot-dot-slash (../)&quot; sequences and its variations, or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system, including application source code, configuration, and other critical system files.</p>
+          <p>Being able to access and manipulate an arbitrary path leads to vulnerabilities when a program is being run with privileges that the user providing the path should not have. A website with a path traversal vulnerability would allow users access to sensitive files on the server hosting it. CLI programs may also be vulnerable to path traversal if they are being ran with elevated privileges (such as with the setuid or setgid flags in Unix systems).</p>
+          <p>Directory Traversal vulnerabilities can be generally divided into two types:</p>
+          <ul>
+          <li><strong>Information Disclosure</strong>: Allows the attacker to gain information about the folder structure or read the contents of sensitive files on the system.</li>
+          </ul>
+          <p><code>st</code> is a module for serving static files on web pages, and contains a <a href="https://snyk.io/vuln/npm:st:20140206">vulnerability of this type</a>. In our example, we will serve files from the <code>public</code> route.</p>
+          <p>If an attacker requests the following URL from our server, it will in turn leak the sensitive private key of the root user.</p>
+          <pre><code>curl http://localhost:8080/public/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/root/.ssh/id_rsa
+          </code></pre>
+          <p><strong>Note</strong> <code>%2e</code> is the URL encoded version of <code>.</code> (dot).</p>
+          <ul>
+          <li><strong>Writing arbitrary files</strong>: Allows the attacker to create or replace existing files. This type of vulnerability is also known as <code>Zip-Slip</code>.</li>
+          </ul>
+          <p>One way to achieve this is by using a malicious <code>zip</code> archive that holds path traversal filenames. When each filename in the zip archive gets concatenated to the target extraction folder, without validation, the final path ends up outside of the target folder. If an executable or a configuration file is overwritten with a file containing malicious code, the problem can turn into an arbitrary code execution issue quite easily.</p>
+          <p>The following is an example of a <code>zip</code> archive with one benign file and one malicious file. Extracting the malicious file will result in traversing out of the target folder, ending up in <code>/root/.ssh/</code> overwriting the <code>authorized_keys</code> file:</p>
+          <pre><code>2018-04-15 22:04:29 .....           19           19  good.txt
+          2018-04-15 22:04:42 .....           20           20  ../../../../../../root/.ssh/authorized_keys
+          </code></pre>
+          </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card card--vuln disclosure--not-new severity--low"  data-snyk-test="low">
+              <input type="radio" name="tab-view-2" id="tab-dataflow-2" value="dataflow" class="card__tab__radio" checked>
+              <input type="radio" name="tab-view-2" id="tab-fix-2" value="fix" class="card__tab__radio" >
+          
+              <header class="card__header">
+                  <div class="card__header__main">
+                      <div class="severity-icon severity-icon--low"></div>
+                      <h2 class="card__title">Path Traversal</h2>
+                      <div class="card__actions">
+                          <label for="tab-dataflow-2" class="card__action">Data Flow</label>
+                          <label for="tab-fix-2" class="card__action">Fix Analysis</label>
+                      </div>
+                  </div>
+                  <ul class="card__meta">
+                      <li class="card__meta__item">SNYK-CODE</li>
+                      <li class="card__meta__item">CWE-23</li>
+                      <li class="card__meta__item">PT</li>
+                  </ul>
+              </header>
+              <div class="card__section">
+                  <div class="card__summary severity--low">
+                      <p>Unsanitized input from a command line argument flows into os.unlink, where it is used as a path. This may result in a Path Traversal vulnerability and allow an attacker to remove arbitrary files.</p>
+                      <div class="file-location">Found in: <strong>cli.py (line : 233)</strong></div>
+                  </div>
+                  <div class="card__panel dataflow">
+                      <h2 class="card__panel__heading"><span class="heading-char">⇣</span> Data Flow</h2>
+                      <div class="dataflow__filename"> cli.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          <span class="dataflow__badge" title="Data is 'tainted' if it comes from an insecure source such as a file, the network, or the user. This tainted data is passed to a sensitive sink, as described below.">Source</span>
+                          <span class="dataflow__step">0</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          
+                          <span class="dataflow__step">1</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">args &#x3D; parser.parse_args()</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">2</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:47</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        target_path, is_dir &#x3D; _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser)</span></div>
+                          
+                          <span class="dataflow__step">3</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">271:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser):</span></div>
+                          
+                          <span class="dataflow__step">4</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.</span><span class="dataflow__codesuffix">file and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">5</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.file </span><span class="dataflow__codesuffix">and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">6</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    target_path &#x3D; <br /></span><span class="marker">args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">7</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">target_path &#x3D; args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">8</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">287:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir</span></div>
+                          
+                          <span class="dataflow__step">9</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir &#x3D; _resolve_target(args, parser)</span></div>
+                          
+                          <span class="dataflow__step">10</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">325:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _print_target_summary(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> method_label, args.randomize_name)</span></div>
+                          
+                          <span class="dataflow__step">11</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">244:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _print_target_summary(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> method_label: str, randomize_name: bool) -&gt; None:</span></div>
+                          
+                          <span class="dataflow__step">12</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">332:71</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _run_directory(target_path, args) if is_dir else _run_file(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args)</span></div>
+                          
+                          <span class="dataflow__step">13</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">230:15</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _run_file(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> args) -&gt; int:</span></div>
+                          
+                          <span class="dataflow__step">14</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">233:33</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        result &#x3D; gutmann_35pass(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args.randomize_name, _cli_progress)</span></div>
+                          
+                          <span class="dataflow__step">15</span>
+                      </div>
+                      <div class="dataflow__filename"> sdet/erasure_engine.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">312:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">16</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">325:37</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        &quot;sha256_path&quot;: _sha256_path(<br /></span><span class="marker">filepath)</span><span class="dataflow__codesuffix">,</span></div>
+                          
+                          <span class="dataflow__step">17</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">92:18</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _sha256_path(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; str:</span></div>
+                          
+                          <span class="dataflow__step">18</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">331:28</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        if _is_blacklisted(<br /></span><span class="marker">filepath)</span><span class="dataflow__codesuffix">:</span></div>
+                          
+                          <span class="dataflow__step">19</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">128:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _is_blacklisted(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; bool:</span></div>
+                          
+                          <span class="dataflow__step">20</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">341:43</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        if not _perform_gutmann_overwrite(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> randomize_name, result, progress_callback, stop_event):</span></div>
+                          
+                          <span class="dataflow__step">21</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">365:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">22</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">382:38</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not _perform_overwrite_passes(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> patterns, total_passes, result, progress_callback, stop_event):</span></div>
+                          
+                          <span class="dataflow__step">23</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">389:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">24</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">385:46</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _truncate_and_remove_file_gutmann(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> randomize_name, result, progress_callback)</span></div>
+                          
+                          <span class="dataflow__step">25</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">421:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">26</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">436:20</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    current_path &#x3D; <br /></span><span class="marker">filepath</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">27</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">436:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">current_path &#x3D; filepath</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">28</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">445:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        os.unlink(<br /></span><span class="marker">current_path)</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">29</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">445:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">os.unlink(</span><span class="dataflow__codesuffix">current_path)</span></div>
+                          <span class="dataflow__badge" title="Sinks are the operations that must receive clean data and that you wouldn't want an attacker to be able to manipulate.">Sink</span>
+                          <span class="dataflow__step">30</span>
+                      </div>
+                  </div>
+                  <div class="card__panel fix-analysis">
+                      <h2 class="card__panel__heading"><span class="heading-char">✓</span> Fix Analysis</h2>
+                      <div class="card__panel__markdown"><h2 id="details">Details</h2>
+          <p>A Directory Traversal attack (also known as path traversal) aims to access files and directories that are stored outside the intended folder. By manipulating files with &quot;dot-dot-slash (../)&quot; sequences and its variations, or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system, including application source code, configuration, and other critical system files.</p>
+          <p>Being able to access and manipulate an arbitrary path leads to vulnerabilities when a program is being run with privileges that the user providing the path should not have. A website with a path traversal vulnerability would allow users access to sensitive files on the server hosting it. CLI programs may also be vulnerable to path traversal if they are being ran with elevated privileges (such as with the setuid or setgid flags in Unix systems).</p>
+          <p>Directory Traversal vulnerabilities can be generally divided into two types:</p>
+          <ul>
+          <li><strong>Information Disclosure</strong>: Allows the attacker to gain information about the folder structure or read the contents of sensitive files on the system.</li>
+          </ul>
+          <p><code>st</code> is a module for serving static files on web pages, and contains a <a href="https://snyk.io/vuln/npm:st:20140206">vulnerability of this type</a>. In our example, we will serve files from the <code>public</code> route.</p>
+          <p>If an attacker requests the following URL from our server, it will in turn leak the sensitive private key of the root user.</p>
+          <pre><code>curl http://localhost:8080/public/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/root/.ssh/id_rsa
+          </code></pre>
+          <p><strong>Note</strong> <code>%2e</code> is the URL encoded version of <code>.</code> (dot).</p>
+          <ul>
+          <li><strong>Writing arbitrary files</strong>: Allows the attacker to create or replace existing files. This type of vulnerability is also known as <code>Zip-Slip</code>.</li>
+          </ul>
+          <p>One way to achieve this is by using a malicious <code>zip</code> archive that holds path traversal filenames. When each filename in the zip archive gets concatenated to the target extraction folder, without validation, the final path ends up outside of the target folder. If an executable or a configuration file is overwritten with a file containing malicious code, the problem can turn into an arbitrary code execution issue quite easily.</p>
+          <p>The following is an example of a <code>zip</code> archive with one benign file and one malicious file. Extracting the malicious file will result in traversing out of the target folder, ending up in <code>/root/.ssh/</code> overwriting the <code>authorized_keys</code> file:</p>
+          <pre><code>2018-04-15 22:04:29 .....           19           19  good.txt
+          2018-04-15 22:04:42 .....           20           20  ../../../../../../root/.ssh/authorized_keys
+          </code></pre>
+          </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card card--vuln disclosure--not-new severity--low"  data-snyk-test="low">
+              <input type="radio" name="tab-view-3" id="tab-dataflow-3" value="dataflow" class="card__tab__radio" checked>
+              <input type="radio" name="tab-view-3" id="tab-fix-3" value="fix" class="card__tab__radio" >
+          
+              <header class="card__header">
+                  <div class="card__header__main">
+                      <div class="severity-icon severity-icon--low"></div>
+                      <h2 class="card__title">Path Traversal</h2>
+                      <div class="card__actions">
+                          <label for="tab-dataflow-3" class="card__action">Data Flow</label>
+                          <label for="tab-fix-3" class="card__action">Fix Analysis</label>
+                      </div>
+                  </div>
+                  <ul class="card__meta">
+                      <li class="card__meta__item">SNYK-CODE</li>
+                      <li class="card__meta__item">CWE-23</li>
+                      <li class="card__meta__item">PT</li>
+                  </ul>
+              </header>
+              <div class="card__section">
+                  <div class="card__summary severity--low">
+                      <p>Unsanitized input from a command line argument flows into os.unlink, where it is used as a path. This may result in a Path Traversal vulnerability and allow an attacker to remove arbitrary files.</p>
+                      <div class="file-location">Found in: <strong>cli.py (line : 236)</strong></div>
+                  </div>
+                  <div class="card__panel dataflow">
+                      <h2 class="card__panel__heading"><span class="heading-char">⇣</span> Data Flow</h2>
+                      <div class="dataflow__filename"> cli.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          <span class="dataflow__badge" title="Data is 'tainted' if it comes from an insecure source such as a file, the network, or the user. This tainted data is passed to a sensitive sink, as described below.">Source</span>
+                          <span class="dataflow__step">0</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          
+                          <span class="dataflow__step">1</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">args &#x3D; parser.parse_args()</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">2</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:47</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        target_path, is_dir &#x3D; _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser)</span></div>
+                          
+                          <span class="dataflow__step">3</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">271:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser):</span></div>
+                          
+                          <span class="dataflow__step">4</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.</span><span class="dataflow__codesuffix">file and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">5</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.file </span><span class="dataflow__codesuffix">and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">6</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    target_path &#x3D; <br /></span><span class="marker">args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">7</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">target_path &#x3D; args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">8</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">287:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir</span></div>
+                          
+                          <span class="dataflow__step">9</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir &#x3D; _resolve_target(args, parser)</span></div>
+                          
+                          <span class="dataflow__step">10</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">325:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _print_target_summary(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> method_label, args.randomize_name)</span></div>
+                          
+                          <span class="dataflow__step">11</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">244:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _print_target_summary(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> method_label: str, randomize_name: bool) -&gt; None:</span></div>
+                          
+                          <span class="dataflow__step">12</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">332:71</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _run_directory(target_path, args) if is_dir else _run_file(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args)</span></div>
+                          
+                          <span class="dataflow__step">13</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">230:15</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _run_file(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> args) -&gt; int:</span></div>
+                          
+                          <span class="dataflow__step">14</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">236:32</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        result &#x3D; dod_overwrite(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args.dod_passes, args.randomize_name, _cli_progress)</span></div>
+                          
+                          <span class="dataflow__step">15</span>
+                      </div>
+                      <div class="dataflow__filename"> sdet/erasure_engine.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">458:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">16</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">475:37</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        &quot;sha256_path&quot;: _sha256_path(<br /></span><span class="marker">filepath)</span><span class="dataflow__codesuffix">,</span></div>
+                          
+                          <span class="dataflow__step">17</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">92:18</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _sha256_path(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; str:</span></div>
+                          
+                          <span class="dataflow__step">18</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">481:28</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        if _is_blacklisted(<br /></span><span class="marker">filepath)</span><span class="dataflow__codesuffix">:</span></div>
+                          
+                          <span class="dataflow__step">19</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">128:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _is_blacklisted(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; bool:</span></div>
+                          
+                          <span class="dataflow__step">20</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">491:39</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        if not _perform_dod_overwrite(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> patterns, passes, randomize_name, result, progress_callback, stop_event):</span></div>
+                          
+                          <span class="dataflow__step">21</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">515:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">22</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">526:32</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not _perform_dod_passes(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> patterns, total, result, progress_callback, stop_event):</span></div>
+                          
+                          <span class="dataflow__step">23</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">533:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">24</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">529:42</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _truncate_and_remove_file_dod(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> randomize_name, passes, result, progress_callback)</span></div>
+                          
+                          <span class="dataflow__step">25</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">565:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">26</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">581:20</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    current_path &#x3D; <br /></span><span class="marker">filepath</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">27</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">581:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">current_path &#x3D; filepath</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">28</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">590:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        os.unlink(<br /></span><span class="marker">current_path)</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">29</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">590:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">os.unlink(</span><span class="dataflow__codesuffix">current_path)</span></div>
+                          <span class="dataflow__badge" title="Sinks are the operations that must receive clean data and that you wouldn't want an attacker to be able to manipulate.">Sink</span>
+                          <span class="dataflow__step">30</span>
+                      </div>
+                  </div>
+                  <div class="card__panel fix-analysis">
+                      <h2 class="card__panel__heading"><span class="heading-char">✓</span> Fix Analysis</h2>
+                      <div class="card__panel__markdown"><h2 id="details">Details</h2>
+          <p>A Directory Traversal attack (also known as path traversal) aims to access files and directories that are stored outside the intended folder. By manipulating files with &quot;dot-dot-slash (../)&quot; sequences and its variations, or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system, including application source code, configuration, and other critical system files.</p>
+          <p>Being able to access and manipulate an arbitrary path leads to vulnerabilities when a program is being run with privileges that the user providing the path should not have. A website with a path traversal vulnerability would allow users access to sensitive files on the server hosting it. CLI programs may also be vulnerable to path traversal if they are being ran with elevated privileges (such as with the setuid or setgid flags in Unix systems).</p>
+          <p>Directory Traversal vulnerabilities can be generally divided into two types:</p>
+          <ul>
+          <li><strong>Information Disclosure</strong>: Allows the attacker to gain information about the folder structure or read the contents of sensitive files on the system.</li>
+          </ul>
+          <p><code>st</code> is a module for serving static files on web pages, and contains a <a href="https://snyk.io/vuln/npm:st:20140206">vulnerability of this type</a>. In our example, we will serve files from the <code>public</code> route.</p>
+          <p>If an attacker requests the following URL from our server, it will in turn leak the sensitive private key of the root user.</p>
+          <pre><code>curl http://localhost:8080/public/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/root/.ssh/id_rsa
+          </code></pre>
+          <p><strong>Note</strong> <code>%2e</code> is the URL encoded version of <code>.</code> (dot).</p>
+          <ul>
+          <li><strong>Writing arbitrary files</strong>: Allows the attacker to create or replace existing files. This type of vulnerability is also known as <code>Zip-Slip</code>.</li>
+          </ul>
+          <p>One way to achieve this is by using a malicious <code>zip</code> archive that holds path traversal filenames. When each filename in the zip archive gets concatenated to the target extraction folder, without validation, the final path ends up outside of the target folder. If an executable or a configuration file is overwritten with a file containing malicious code, the problem can turn into an arbitrary code execution issue quite easily.</p>
+          <p>The following is an example of a <code>zip</code> archive with one benign file and one malicious file. Extracting the malicious file will result in traversing out of the target folder, ending up in <code>/root/.ssh/</code> overwriting the <code>authorized_keys</code> file:</p>
+          <pre><code>2018-04-15 22:04:29 .....           19           19  good.txt
+          2018-04-15 22:04:42 .....           20           20  ../../../../../../root/.ssh/authorized_keys
+          </code></pre>
+          </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card card--vuln disclosure--not-new severity--low"  data-snyk-test="low">
+              <input type="radio" name="tab-view-4" id="tab-dataflow-4" value="dataflow" class="card__tab__radio" checked>
+              <input type="radio" name="tab-view-4" id="tab-fix-4" value="fix" class="card__tab__radio" >
+          
+              <header class="card__header">
+                  <div class="card__header__main">
+                      <div class="severity-icon severity-icon--low"></div>
+                      <h2 class="card__title">Path Traversal</h2>
+                      <div class="card__actions">
+                          <label for="tab-dataflow-4" class="card__action">Data Flow</label>
+                          <label for="tab-fix-4" class="card__action">Fix Analysis</label>
+                      </div>
+                  </div>
+                  <ul class="card__meta">
+                      <li class="card__meta__item">SNYK-CODE</li>
+                      <li class="card__meta__item">CWE-23</li>
+                      <li class="card__meta__item">PT</li>
+                  </ul>
+              </header>
+              <div class="card__section">
+                  <div class="card__summary severity--low">
+                      <p>Unsanitized input from a command line argument flows into os.unlink, where it is used as a path. This may result in a Path Traversal vulnerability and allow an attacker to remove arbitrary files.</p>
+                      <div class="file-location">Found in: <strong>cli.py (line : 238)</strong></div>
+                  </div>
+                  <div class="card__panel dataflow">
+                      <h2 class="card__panel__heading"><span class="heading-char">⇣</span> Data Flow</h2>
+                      <div class="dataflow__filename"> cli.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          <span class="dataflow__badge" title="Data is 'tainted' if it comes from an insecure source such as a file, the network, or the user. This tainted data is passed to a sensitive sink, as described below.">Source</span>
+                          <span class="dataflow__step">0</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    args &#x3D; <br /></span><span class="marker">parser.parse_args(</span><span class="dataflow__codesuffix">)</span></div>
+                          
+                          <span class="dataflow__step">1</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">305:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">args &#x3D; parser.parse_args()</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">2</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:47</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        target_path, is_dir &#x3D; _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser)</span></div>
+                          
+                          <span class="dataflow__step">3</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">271:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _resolve_target(<br /></span><span class="marker">args,</span><span class="dataflow__codesuffix"> parser):</span></div>
+                          
+                          <span class="dataflow__step">4</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.</span><span class="dataflow__codesuffix">file and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">5</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">272:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    if not <br /></span><span class="marker">args.file </span><span class="dataflow__codesuffix">and not args.dir:</span></div>
+                          
+                          <span class="dataflow__step">6</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    target_path &#x3D; <br /></span><span class="marker">args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">7</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">277:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">target_path &#x3D; args.file or args.dir</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">8</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">287:12</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir</span></div>
+                          
+                          <span class="dataflow__step">9</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">319:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> is_dir &#x3D; _resolve_target(args, parser)</span></div>
+                          
+                          <span class="dataflow__step">10</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">325:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _print_target_summary(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> method_label, args.randomize_name)</span></div>
+                          
+                          <span class="dataflow__step">11</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">244:27</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _print_target_summary(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> method_label: str, randomize_name: bool) -&gt; None:</span></div>
+                          
+                          <span class="dataflow__step">12</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">332:71</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _run_directory(target_path, args) if is_dir else _run_file(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args)</span></div>
+                          
+                          <span class="dataflow__step">13</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">230:15</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _run_file(<br /></span><span class="marker">target_path: str,</span><span class="dataflow__codesuffix"> args) -&gt; int:</span></div>
+                          
+                          <span class="dataflow__step">14</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">238:29</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        result &#x3D; nist_clear(<br /></span><span class="marker">target_path,</span><span class="dataflow__codesuffix"> args.randomize_name, _cli_progress)</span></div>
+                          
+                          <span class="dataflow__step">15</span>
+                      </div>
+                      <div class="dataflow__filename"> sdet/erasure_engine.py</div>
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">178:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">16</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">195:37</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        &quot;sha256_path&quot;: _sha256_path(<br /></span><span class="marker">filepath)</span><span class="dataflow__codesuffix">,</span></div>
+                          
+                          <span class="dataflow__step">17</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">92:18</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _sha256_path(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; str:</span></div>
+                          
+                          <span class="dataflow__step">18</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">201:28</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        if _is_blacklisted(<br /></span><span class="marker">filepath)</span><span class="dataflow__codesuffix">:</span></div>
+                          
+                          <span class="dataflow__step">19</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">128:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _is_blacklisted(<br /></span><span class="marker">path: str)</span><span class="dataflow__codesuffix"> -&gt; bool:</span></div>
+                          
+                          <span class="dataflow__step">20</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">211:46</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        if not _perform_nist_clear_overwrite(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> randomize_name, result, progress_callback, stop_event):</span></div>
+                          
+                          <span class="dataflow__step">21</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">235:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">22</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">257:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    _overwrite_pass(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> None, file_size)</span></div>
+                          
+                          <span class="dataflow__step">23</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">137:21</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">def _overwrite_pass(<br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"> pattern: Optional[bytes], file_size: int) -&gt; None:</span></div>
+                          
+                          <span class="dataflow__step">24</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">266:38</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    return _truncate_and_remove_file(<br /></span><span class="marker">filepath,</span><span class="dataflow__codesuffix"> randomize_name, result, progress_callback)</span></div>
+                          
+                          <span class="dataflow__step">25</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">270:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">filepath: str,</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">26</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">288:20</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    current_path &#x3D; <br /></span><span class="marker">filepath</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">27</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">288:5</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">    <br /></span><span class="marker">current_path &#x3D; filepath</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">28</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">299:19</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        os.unlink(<br /></span><span class="marker">current_path)</span><span class="dataflow__codesuffix"></span></div>
+                          
+                          <span class="dataflow__step">29</span>
+                      </div>
+                      
+                      <div class="dataflow__item">
+                          <span class="dataflow__lineno" title="line:column">299:9</span>
+                          <div class="dataflow__code"><span class="dataflow__codeprefix">        <br /></span><span class="marker">os.unlink(</span><span class="dataflow__codesuffix">current_path)</span></div>
+                          <span class="dataflow__badge" title="Sinks are the operations that must receive clean data and that you wouldn't want an attacker to be able to manipulate.">Sink</span>
+                          <span class="dataflow__step">30</span>
+                      </div>
+                  </div>
+                  <div class="card__panel fix-analysis">
+                      <h2 class="card__panel__heading"><span class="heading-char">✓</span> Fix Analysis</h2>
+                      <div class="card__panel__markdown"><h2 id="details">Details</h2>
+          <p>A Directory Traversal attack (also known as path traversal) aims to access files and directories that are stored outside the intended folder. By manipulating files with &quot;dot-dot-slash (../)&quot; sequences and its variations, or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system, including application source code, configuration, and other critical system files.</p>
+          <p>Being able to access and manipulate an arbitrary path leads to vulnerabilities when a program is being run with privileges that the user providing the path should not have. A website with a path traversal vulnerability would allow users access to sensitive files on the server hosting it. CLI programs may also be vulnerable to path traversal if they are being ran with elevated privileges (such as with the setuid or setgid flags in Unix systems).</p>
+          <p>Directory Traversal vulnerabilities can be generally divided into two types:</p>
+          <ul>
+          <li><strong>Information Disclosure</strong>: Allows the attacker to gain information about the folder structure or read the contents of sensitive files on the system.</li>
+          </ul>
+          <p><code>st</code> is a module for serving static files on web pages, and contains a <a href="https://snyk.io/vuln/npm:st:20140206">vulnerability of this type</a>. In our example, we will serve files from the <code>public</code> route.</p>
+          <p>If an attacker requests the following URL from our server, it will in turn leak the sensitive private key of the root user.</p>
+          <pre><code>curl http://localhost:8080/public/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/root/.ssh/id_rsa
+          </code></pre>
+          <p><strong>Note</strong> <code>%2e</code> is the URL encoded version of <code>.</code> (dot).</p>
+          <ul>
+          <li><strong>Writing arbitrary files</strong>: Allows the attacker to create or replace existing files. This type of vulnerability is also known as <code>Zip-Slip</code>.</li>
+          </ul>
+          <p>One way to achieve this is by using a malicious <code>zip</code> archive that holds path traversal filenames. When each filename in the zip archive gets concatenated to the target extraction folder, without validation, the final path ends up outside of the target folder. If an executable or a configuration file is overwritten with a file containing malicious code, the problem can turn into an arbitrary code execution issue quite easily.</p>
+          <p>The following is an example of a <code>zip</code> archive with one benign file and one malicious file. Extracting the malicious file will result in traversing out of the target folder, ending up in <code>/root/.ssh/</code> overwriting the <code>authorized_keys</code> file:</p>
+          <pre><code>2018-04-15 22:04:29 .....           19           19  good.txt
+          2018-04-15 22:04:42 .....           20           20  ../../../../../../root/.ssh/authorized_keys
+          </code></pre>
+          </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card card--vuln disclosure--not-new severity--low"  data-snyk-test="low">
+              <input type="radio" name="tab-view-5" id="tab-dataflow-5" value="dataflow" class="card__tab__radio" checked>
+              <input type="radio" name="tab-view-5" id="tab-fix-5" value="fix" class="card__tab__radio" >
+          
+              <header class="card__header">
+                  <div class="card__header__main">
+                      <div class="severity-icon severity-icon--low"></div>
+                      <h2 class="card__title">Sensitive Cookie in HTTPS Session Without &#x27;Secure&#x27; Attribute</h2>
+                      <div class="card__actions">
+                          <label for="tab-dataflow-5" class="card__action">Data Flow</label>
+                          <label for="tab-fix-5" class="card__action">Fix Analysis</label>
                       </div>
                   </div>
                   <ul class="card__meta">
