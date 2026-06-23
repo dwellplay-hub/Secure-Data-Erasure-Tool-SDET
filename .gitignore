@@ -1,56 +1,24 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# compiled output
-dist
-tmp
-out-tsc
-*.tsbuildinfo
-.expo
-.expo-shared
+# Caches and Environments
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
 
-# dependencies
-node_modules
+# PyInstaller / Executable Builds
+build/
+dist/
+*.spec
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+# Confidential SAST Scan Reports
+Laporan_SAST_SDET.html
+Laporan_SAST_Snyk.html
 
 # System Files
 .DS_Store
 Thumbs.db
-
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
-# Replit
-.cache/
-.local/
-
-build/
-__pycache__/
-*.pyc
-
-Laporan_SAST_SDET.html
-Laporan_SAST_Snyk.html

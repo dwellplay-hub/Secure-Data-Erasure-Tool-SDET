@@ -1,8 +1,10 @@
 [project]
-name = "repl-nix-workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "secure-data-erasure-tool-sdet"
+version = "1.2.8"
+description = "Production-grade anti-forensics secure data destruction utility compliant with NIST SP 800-88"
 requires-python = ">=3.11"
 dependencies = [
     "customtkinter>=5.2.2",
+    "darkdetect>=0.8.0",
+    "packaging>=23.0",
 ]
