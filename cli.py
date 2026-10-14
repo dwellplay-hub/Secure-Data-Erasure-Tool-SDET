@@ -268,14 +268,25 @@ def _handle_cleanup_logs(args):
     )
     return 0 if ok else 1
 
-def _resolve_target(args, parser):
+from pathlib import Path
+
+def _resolve_target(args, parser) -> tuple[str, bool]:
     if not args.file and not args.dir:
         _print_colored("  ✖ ERROR: Specify --file or --dir.\n", "red")
         parser.print_help()
         raise ValueError("missing target")
 
-    target_path = args.file or args.dir
-    is_dir = bool(args.dir) or os.path.isdir(target_path)
+    raw_path = args.file or args.dir
+    
+    # Menukar laluan relatif/kotor kepada format mutlak gred tinggi menggunakan Pathlib
+    resolved_path = Path(raw_path).resolve()
+    target_path = str(resolved_path)
+    
+    if ".." in raw_path:
+        _print_colored("  ✖ SECURITY ERROR: Directory traversal sequences are strictly prohibited.", "red")
+        raise ValueError("path traversal block")
+
+    is_dir = bool(args.dir) or resolved_path.is_dir()
 
     if is_dir and not args.recursive:
         _print_colored(

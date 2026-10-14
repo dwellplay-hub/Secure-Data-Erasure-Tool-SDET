@@ -4,7 +4,6 @@ A production-grade, secure data deletion utility featuring both a Modern Desktop
 
 ## 🛠️ System Architecture & Frameworks
 - **Core Engine:** Pure Python 3 
-- **GUI Controller (`main.py`):** Driven by `CustomTkinter` 
 - **CLI Controller (`cli.py`):** Driven by Python's native `argparse` with strict validation schemes.
 
 ## 🔒 Sanitization Standards Implemented
