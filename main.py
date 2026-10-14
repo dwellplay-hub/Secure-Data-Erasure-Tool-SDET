@@ -246,11 +246,11 @@ class SDETApp(ctk.CTk):
         self._advanced_method_frame = ctk.CTkFrame(self._method_card, fg_color="transparent")
 
         methods = [
-            ("nist_clear",   "✅  NIST SP 800-88 CLEAR",        "Recommended — 1-pass random + fsync + unlink",  COLOR_SAFE),
-            ("gutmann",      "⚠  Gutmann 35-pass",              "LEGACY — Not for SSDs. Educational only.",       COLOR_WARNING),
-            ("dod3",         "⚠  DoD 3-pass",                   "DEPRECATED per NIST SP 800-88. Educational.",    COLOR_WARNING),
-            ("dod7",         "⚠  DoD 7-pass",                   "DEPRECATED per NIST SP 800-88. Educational.",    COLOR_WARNING),
-            ("purge_info",   "ℹ  NIST PURGE (Info Only)",        "Software cannot perform PURGE. Info only.",      COLOR_INFO),
+            ("nist_clear",   "✅  NIST SP 800-88 CLEAR",                   "Recommended — 1-pass random + fsync + unlink",                  COLOR_SAFE),
+            ("gutmann",      "⚠  Gutmann 35-pass ",            "Not for SSDs (Deprecated per NIST SP 800-88).",                 COLOR_WARNING),
+            ("dod3",         "⚠  DoD 3-pass ",                 "Deprecated per NIST SP 800-88.",                                COLOR_WARNING),
+            ("dod7",         "⚠  DoD 7-pass ",                 "Deprecated per NIST SP 800-88.",                                COLOR_WARNING),
+            ("purge_info",   "ℹ  NIST PURGE ",                  "Software cannot perform PURGE. Info only.",                     COLOR_INFO),
         ]
 
         for method_id, label, desc, color in methods:
@@ -591,16 +591,16 @@ class SDETApp(ctk.CTk):
         method = self._method.get()
         method_name = {
             "nist_clear": "NIST SP 800-88 CLEAR",
-            "gutmann": "Gutmann 35-pass (LEGACY)",
-            "dod3": "DoD 3-pass (DEPRECATED)",
-            "dod7": "DoD 7-pass (DEPRECATED)",
+            "gutmann": "Gutmann 35-pass (Deprecated per NIST SP 800-88)",
+            "dod3": "DoD 3-pass (Deprecated per NIST SP 800-88)",
+            "dod7": "DoD 7-pass (Deprecated per NIST SP 800-88)",
         }.get(method, method)
 
         warning_extra = ""
         if method == "gutmann":
-            warning_extra = "\n\n⚠ LEGACY METHOD: Not recommended for SSDs. Educational only."
+            warning_extra = "\n\n⚠ LEGACY METHOD: Not recommended for SSDs (Deprecated per NIST SP 800-88)."
         elif method in ("dod3", "dod7"):
-            warning_extra = "\n\n⚠ DEPRECATED METHOD: Obsolete per NIST SP 800-88 Rev. 2."
+            warning_extra = "\n\n⚠ Deprecated per NIST SP 800-88: Multi-pass overwrites are superseded by NIST SP 800-88 Clear specifications."
 
         # MASK NAMA FAIL DI DALAM POPUP AMARAN
         masked_target = _mask_filename(os.path.basename(path))
@@ -651,12 +651,12 @@ class SDETApp(ctk.CTk):
 
     def _resolve_erase_params(self, method: str):
         if method == "gutmann":
-            return "gutmann", 3
+            return "gutmann", 35
         if method == "dod7":
             return "dod", 7
         if method == "dod3":
             return "dod", 3
-        return "nist_clear", 3
+        return "nist_clear", 1
 
     def _log_file_result(self, result):
         status = result.get("status")
