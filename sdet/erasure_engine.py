@@ -1,7 +1,7 @@
 """
 SDET Erasure Engine
 Core secure deletion logic implementing NIST SP 800-88 Rev. 2 CLEAR and
-legacy educational methods (Gutmann, DoD).
+legacy methods (Gutmann, DoD) Deprecated per NIST SP 800-88.
 """
 
 import os
@@ -17,10 +17,9 @@ import logging
 from pathlib import Path
 from typing import Callable, Optional, List
 
-# <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+# Kunci keselamatan (Race condition patch)
 if os.name == 'nt':
     import msvcrt
-# ---------------------------------------------------------
 
 AUDIT_LOG_FILE = ".sdet_audit.log"
 RANDOMIZE_FAILED_MSG = "Filename randomization failed, proceeding with original name"
@@ -68,7 +67,6 @@ GUTMANN_PATTERNS = [
 DOD_3PASS = [b'\x00', b'\xff', None]
 DOD_7PASS = [b'\x00', b'\xff', None, b'\x00', b'\xff', None, None]
 
-
 SYSTEM_BLACKLIST = [
     "/bin", "/boot", "/dev", "/etc", "/lib", "/lib64", "/proc", "/run",
     "/sbin", "/sys", "/usr", "/var",
@@ -76,22 +74,19 @@ SYSTEM_BLACKLIST = [
     "C:\\System Volume Information", "C:\\ProgramData",
 ]
 
-# <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
 def _lock_file(f):
     """
-    Memaksa kunci eksklusif pada fail di Windows untuk mengelakkan Race Condition.
-    Akan melontarkan PermissionError jika fail sedang digunakan oleh proses lain.
+    Memaksa kunci eksklusif pada berkas di Windows untuk mencegah Race Condition.
+    Akan melempar PermissionError jika berkas sedang digunakan oleh proses lain.
     """
     if os.name == 'nt':
         try:
             msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
         except OSError:
             raise PermissionError("File is locked by another process (Race Condition Prevented).")
-# ---------------------------------------------------------
 
 def _sha256_path(path: str) -> str:
     return hashlib.sha256(path.encode("utf-8")).hexdigest()
-
 
 def _mask_filename(name: str) -> str:
     if not name:
@@ -106,22 +101,17 @@ def _mask_filename(name: str) -> str:
         return f"{masked_base}.{ext}"
     return name[:visible] + "*" * (len(name) - visible)
 
-
 def _audit_log_path() -> Path:
     """
-    KUNCI KESELAMATAN (DISTRIBUTION PATCH):
-    Memastikan fail log sentiasa dicipta di folder tempat perisian dieksekusi,
-    sama ada berjalan sebagai skrip mentah .py atau fail kompilasi .exe (PyInstaller).
+    Memastikan berkas log dibuat pada direktori kerja aplikasi,
+    baik saat dieksekusi sebagai skrip .py maupun biner .exe.
     """
     if getattr(sys, 'frozen', False):
-        # Jika berjalan sebagai .exe, guna folder tempat fail .exe itu berada
         base_dir = Path(sys.executable).parent
     else:
-        # Jika berjalan sebagai skrip Python biasa, guna folder sdet/
         base_dir = Path(__file__).resolve().parent
         
     return base_dir / AUDIT_LOG_FILE
-
 
 def _write_audit(entry: dict) -> None:
     try:
@@ -136,7 +126,6 @@ def _write_audit(entry: dict) -> None:
     except Exception:
         pass
 
-
 def _is_blacklisted(path: str) -> bool:
     abs_path = os.path.normcase(os.path.abspath(path))
     for bl in SYSTEM_BLACKLIST:
@@ -145,11 +134,10 @@ def _is_blacklisted(path: str) -> bool:
             return True
     return False
 
-
 def _overwrite_pass(filepath: str, pattern: Optional[bytes], file_size: int) -> None:
     try:
         with open(filepath, "r+b") as f:
-            _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+            _lock_file(f)
             f.seek(0)
             written = 0
             chunk_size = 65536
@@ -171,12 +159,10 @@ def _overwrite_pass(filepath: str, pattern: Optional[bytes], file_size: int) -> 
         logging.warning(f"IO error during overwrite pass: {str(e)}")
         raise
 
-
 def _randomize_name(filepath: str) -> Optional[str]:
-    """Randomize filename. Returns new path on success, None on failure."""
+    """Randomize filename using CSPRNG. Returns new path on success, None on failure."""
     try:
         parent = os.path.dirname(filepath)
-        # Gunakan secrets (CSPRNG) menggantikan random untuk keselamatan gred industri
         rand_name = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(16))
         new_path = os.path.join(parent, rand_name)
         os.rename(filepath, new_path)
@@ -185,24 +171,20 @@ def _randomize_name(filepath: str) -> Optional[str]:
         logging.warning(f"Failed to randomize filename: {str(e)}")
         return None
 
-
 def nist_clear(
     filepath: str,
     randomize_name: bool = False,
     progress_callback: Optional[Callable[[float, str], None]] = None,
-    stop_event: Optional[threading.Event] = None
+    stop_event: Optional[threading.Event] = None,
+    log_audit: bool = True
 ) -> dict:
-    # ╔══════════════════════════════════════════════════════════════════════╗
-    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
-    # ║ Memaksa laluan input menjadi mutlak & bersih pada mili-saat pertama!  ║
-    # ╚══════════════════════════════════════════════════════════════════════╝
     filepath = os.path.normpath(os.path.abspath(filepath))
 
     result = {
         "method": "NIST_CLEAR",
         "passes": 1,
         "status": "FAILED",
-        "sha256_path": _sha256_path(filepath), # <--- Selamat: Log audit kini dijamin merekod laluan mutlak tulen
+        "sha256_path": _sha256_path(filepath),
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "masked_name": _mask_filename(os.path.basename(filepath)),
     }
@@ -210,43 +192,49 @@ def nist_clear(
     try:
         if _is_blacklisted(filepath):
             result["status"] = "BLOCKED_BLACKLIST"
-            _write_audit(result)
+            if log_audit:
+                _write_audit(result)
             return result
 
         if not os.path.isfile(filepath):
             result["status"] = "FILE_NOT_FOUND"
-            _write_audit(result)
+            if log_audit:
+                _write_audit(result)
             return result
 
-        if not _perform_nist_clear_overwrite(filepath, randomize_name, result, progress_callback, stop_event):
+        if not _perform_nist_clear_overwrite(filepath, randomize_name, result, progress_callback, stop_event, log_audit):
             return result
 
         result["status"] = "SUCCESS"
-        _write_audit(result)
+        if log_audit:
+            _write_audit(result)
         return result
 
     except PermissionError as e:
         result["status"] = f"PERMISSION_ERROR: {str(e)}"
         logging.exception(PERMISSION_DENIED_MSG)
-        _write_audit(result)
+        if log_audit:
+            _write_audit(result)
         return result
     except FileNotFoundError as e:
         result["status"] = f"FILE_NOT_FOUND: {str(e)}"
-        _write_audit(result)
+        if log_audit:
+            _write_audit(result)
         return result
     except Exception as e:
         result["status"] = f"ERROR: {type(e).__name__}: {str(e)}"
         logging.exception("Unexpected error during NIST Clear")
-        _write_audit(result)
+        if log_audit:
+            _write_audit(result)
         return result
-
 
 def _perform_nist_clear_overwrite(
     filepath: str,
     randomize_name: bool,
     result: dict,
     progress_callback: Optional[Callable[[float, str], None]],
-    stop_event: Optional[threading.Event]
+    stop_event: Optional[threading.Event],
+    log_audit: bool = True
 ) -> bool:
     """Helper function to perform NIST Clear overwrite. Returns True on success."""
     file_size = os.path.getsize(filepath)
@@ -258,7 +246,6 @@ def _perform_nist_clear_overwrite(
         result["status"] = "ABORTED"
         return False
 
-    # Recheck file size to prevent race condition
     actual_size = os.path.getsize(filepath)
     if actual_size != file_size:
         logging.warning(f"{FILE_SIZE_CHANGED_MSG}: {file_size} -> {actual_size}")
@@ -273,18 +260,18 @@ def _perform_nist_clear_overwrite(
         result["status"] = "ABORTED"
         return False
 
-    return _truncate_and_remove_file(filepath, randomize_name, result, progress_callback)
-
+    return _truncate_and_remove_file(filepath, randomize_name, result, progress_callback, log_audit)
 
 def _truncate_and_remove_file(
     filepath: str,
     randomize_name: bool,
     result: dict,
-    progress_callback: Optional[Callable[[float, str], None]]
+    progress_callback: Optional[Callable[[float, str], None]],
+    log_audit: bool = True
 ) -> bool:
     """Truncate file and remove it. Returns True on success."""
     with open(filepath, "r+b") as f:
-        _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+        _lock_file(f)
         f.truncate(0)
         f.flush()
         try:
@@ -306,21 +293,17 @@ def _truncate_and_remove_file(
             logging.warning(RANDOMIZE_FAILED_MSG)
 
     try:
-        # ╔════════════════════════════════════════════════════════════════════════════════════════╗
-        # ║ SNYK SUPPRESSION LAYER (CWE-23 LULUS AUTOMATIK)                                        ║
-        # ║ snyk ignore: CWE-23 (False Positive: Intended administrative CLI file erasure feature)  ║
-        # ╚════════════════════════════════════════════════════════════════════════════════════════╝
         os.unlink(current_path)
     except OSError as e:
         result["status"] = f"UNLINK_FAILED: {str(e)}"
-        _write_audit(result)
+        if log_audit:
+            _write_audit(result)
         return False
 
     if progress_callback:
         progress_callback(1.0, "File securely erased.")
 
     return True
-
 
 def gutmann_35pass(
     filepath: str,
@@ -329,13 +312,9 @@ def gutmann_35pass(
     stop_event: Optional[threading.Event] = None
 ) -> dict:
     """
-    Gutmann 35-pass overwrite — LEGACY EDUCATIONAL ONLY.
-    Not recommended for SSDs. Obsolete per NIST SP 800-88.
+    Gutmann 35-pass overwrite (Deprecated per NIST SP 800-88).
+    Not recommended for SSDs due to wear leveling mechanics.
     """
-    # ╔══════════════════════════════════════════════════════════════════════╗
-    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
-    # ║ Memaksa laluan input menjadi mutlak & bersih pada mili-saat pertama!  ║
-    # ╚══════════════════════════════════════════════════════════════════════╝
     filepath = os.path.normpath(os.path.abspath(filepath))
 
     result = {
@@ -380,7 +359,6 @@ def gutmann_35pass(
         _write_audit(result)
         return result
 
-
 def _perform_gutmann_overwrite(
     filepath: str,
     randomize_name: bool,
@@ -390,20 +368,14 @@ def _perform_gutmann_overwrite(
 ) -> bool:
     """Helper function to perform Gutmann overwrite. Returns True on success."""
     total_passes = len(GUTMANN_PATTERNS)
-
     shuffled_middle = list(GUTMANN_PATTERNS[7:21])
-    
-    # KUNCI KESELAMATAN (CSPRNG): Menggunakan secrets.SystemRandom() 
-    # untuk menyusun corak secara rawak kriptografi yang tidak boleh diramal.
     secrets.SystemRandom().shuffle(shuffled_middle)
-    
     patterns = list(GUTMANN_PATTERNS[:7]) + shuffled_middle + list(GUTMANN_PATTERNS[21:])
 
     if not _perform_overwrite_passes(filepath, patterns, total_passes, result, progress_callback, stop_event):
         return False
 
     return _truncate_and_remove_file_gutmann(filepath, randomize_name, result, progress_callback)
-
 
 def _perform_overwrite_passes(
     filepath: str,
@@ -419,7 +391,6 @@ def _perform_overwrite_passes(
             result["status"] = "ABORTED"
             return False
 
-        # Recheck file size to prevent race condition
         try:
             actual_size = os.path.getsize(filepath)
             logging.debug(f"File size at pass {i+1}: {actual_size}")
@@ -436,7 +407,6 @@ def _perform_overwrite_passes(
 
     return True
 
-
 def _truncate_and_remove_file_gutmann(
     filepath: str,
     randomize_name: bool,
@@ -445,7 +415,7 @@ def _truncate_and_remove_file_gutmann(
 ) -> bool:
     """Truncate file and remove for Gutmann. Returns True on success."""
     with open(filepath, "r+b") as f:
-        _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+        _lock_file(f)
         f.truncate(0)
         f.flush()
         try:
@@ -462,10 +432,6 @@ def _truncate_and_remove_file_gutmann(
             logging.warning(RANDOMIZE_FAILED_MSG)
 
     try:
-        # ╔════════════════════════════════════════════════════════════════════════════════════════╗
-        # ║ SNYK SUPPRESSION LAYER (CWE-23 LULUS AUTOMATIK)                                        ║
-        # ║ snyk ignore: CWE-23 (False Positive: Intended administrative CLI file erasure feature)  ║
-        # ╚════════════════════════════════════════════════════════════════════════════════════════╝
         os.unlink(current_path)
     except OSError as e:
         result["status"] = f"UNLINK_FAILED: {str(e)}"
@@ -477,7 +443,6 @@ def _truncate_and_remove_file_gutmann(
 
     return True
 
-
 def dod_overwrite(
     filepath: str,
     passes: int = 3,
@@ -486,15 +451,10 @@ def dod_overwrite(
     stop_event: Optional[threading.Event] = None
 ) -> dict:
     """
-    DoD 3-pass or 7-pass overwrite — DEPRECATED / EDUCATIONAL ONLY.
-    Obsolete per NIST SP 800-88 Rev. 2.
+    DoD 3-pass or 7-pass overwrite (Deprecated per NIST SP 800-88).
+    Superseded by NIST SP 800-88 Clear single-pass overwrite.
     """
-    # ╔══════════════════════════════════════════════════════════════════════╗
-    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
-    # ║ Memaksa laluan input menjadi mutlak & bersih pada mili-saat pertama!  ║
-    # ╚══════════════════════════════════════════════════════════════════════╝
     filepath = os.path.normpath(os.path.abspath(filepath))
-
     patterns = DOD_3PASS if passes == 3 else DOD_7PASS
     method_name = f"DOD_{passes}PASS"
 
@@ -540,7 +500,6 @@ def dod_overwrite(
         _write_audit(result)
         return result
 
-
 def _perform_dod_overwrite(
     filepath: str,
     patterns: list,
@@ -558,7 +517,6 @@ def _perform_dod_overwrite(
 
     return _truncate_and_remove_file_dod(filepath, randomize_name, passes, result, progress_callback)
 
-
 def _perform_dod_passes(
     filepath: str,
     patterns: list,
@@ -573,7 +531,6 @@ def _perform_dod_passes(
             result["status"] = "ABORTED"
             return False
 
-        # Recheck file size to prevent race condition
         try:
             actual_size = os.path.getsize(filepath)
             logging.debug(f"File size at pass {i+1}: {actual_size}")
@@ -590,7 +547,6 @@ def _perform_dod_passes(
 
     return True
 
-
 def _truncate_and_remove_file_dod(
     filepath: str,
     randomize_name: bool,
@@ -600,11 +556,11 @@ def _truncate_and_remove_file_dod(
 ) -> bool:
     """Truncate file and remove for DoD. Returns True on success."""
     with open(filepath, "r+b") as f:
-        _lock_file(f)  # <-- TAMBAHAN KUNCI KESELAMATAN (RACE CONDITION PATCH)
+        _lock_file(f)
         f.truncate(0)
         f.flush()
         try:
-            os.io_fsync = os.fsync(f.fileno())
+            os.fsync(f.fileno())
         except OSError:
             pass
 
@@ -617,10 +573,6 @@ def _truncate_and_remove_file_dod(
             logging.warning(RANDOMIZE_FAILED_MSG)
 
     try:
-        # ╔════════════════════════════════════════════════════════════════════════════════════════╗
-        # ║ SNYK SUPPRESSION LAYER (CWE-23 LULUS AUTOMATIK)                                        ║
-        # ║ snyk ignore: CWE-23 (False Positive: Intended administrative CLI file erasure feature)  ║
-        # ╚════════════════════════════════════════════════════════════════════════════════════════╝
         os.unlink(current_path)
     except OSError as e:
         result["status"] = f"UNLINK_FAILED: {str(e)}"
@@ -632,7 +584,6 @@ def _truncate_and_remove_file_dod(
 
     return True
 
-
 def erase_directory(
     dirpath: str,
     method: str = "nist_clear",
@@ -642,30 +593,20 @@ def erase_directory(
     stop_event: Optional[threading.Event] = None
 ) -> List[dict]:
     """Recursively erase all files in a directory using streaming to avoid memory issues."""
-    # ╔══════════════════════════════════════════════════════════════════════╗
-    # ║ KUNCI KESELAMATAN (PATH TRAVERSAL PATCH - CWE-23)                     ║
-    # ║ Memaksa laluan folder menjadi mutlak & bersih pada mili-saat pertama!  ║
-    # ╚══════════════════════════════════════════════════════════════════════╝
     dirpath = os.path.normpath(os.path.abspath(dirpath))
-
     results = []
 
     if _is_blacklisted(dirpath):
         return [{"status": "BLOCKED_BLACKLIST", "method": method}]
 
-    # Count total files first (required for progress tracking)
     total = _count_directory_files(dirpath)
     if total == 0:
         return results
 
-    # Stream files instead of loading all into memory
     _erase_files_in_directory(dirpath, method, passes, randomize_name, progress_callback, stop_event, results, total)
-
-    # Remove empty directory tree
     _remove_directory_tree(dirpath)
 
     return results
-
 
 def _count_directory_files(dirpath: str) -> int:
     """Count total files in directory. Returns 0 on error."""
@@ -677,7 +618,6 @@ def _count_directory_files(dirpath: str) -> int:
     except Exception:
         logging.exception("Error counting files in directory")
         return 0
-
 
 def _erase_files_in_directory(
     dirpath: str,
@@ -708,7 +648,6 @@ def _erase_files_in_directory(
     except Exception:
         logging.exception("Error during directory traversal")
 
-
 def _create_progress_callback(
     progress_callback: Optional[Callable[[float, str], None]],
     idx: int,
@@ -726,7 +665,6 @@ def _create_progress_callback(
         progress_callback(overall, msg)
     
     return file_progress
-
 
 def _erase_single_file(
     method: str,
@@ -750,26 +688,20 @@ def _erase_single_file(
         logging.exception(f"Error erasing file {fpath}")
         results.append({"status": "ERROR", "filepath": fpath})
 
-
 def _remove_directory_tree(dirpath: str) -> None:
     """Remove empty directory tree."""
     try:
         import shutil
-        # ╔═════════════════════════════════════════════════════════════════════════════════════════════╗
-        # ║ SNYK SUPPRESSION LAYER (CWE-23 LULUS AUTOMATIK)                                             ║
-        # ║ snyk ignore: CWE-23 (False Positive: Intended administrative CLI directory erasure feature) ║
-        # ╚═════════════════════════════════════════════════════════════════════════════════════════════╝
         shutil.rmtree(dirpath, ignore_errors=True)
     except Exception:
         logging.warning("Failed to remove directory tree")
 
-
 def delete_audit_log() -> bool:
-    """Securely delete the audit log file."""
+    """Securely delete the audit log file without recreating it upon deletion."""
     try:
         log_path = _audit_log_path()
         if log_path.exists():
-            r = nist_clear(str(log_path))
+            r = nist_clear(str(log_path), log_audit=False)
             return r["status"] == "SUCCESS"
         return True
     except Exception:
